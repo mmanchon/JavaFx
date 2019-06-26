@@ -2,6 +2,7 @@ package GUI;
 
 import Interpreter.Interpreter;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
@@ -40,15 +41,20 @@ public class StaticController {
 
     public void setInterpreter(Interpreter interpreter){
         this.interpreter = interpreter;
-
-        tableView.setItems(interpreter.convertToMemoryData());
-        tableView.refresh();
     }
 
     public void setMaxWidth(Stage stage){
         // We bind the prefHeight- and prefWidthProperty to the height and width of the stage.
         tableView.prefWidthProperty().bind(stage.widthProperty());
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+    }
+
+    public void nextLine(){
+
+        this.interpreter.analiseNextLine();
+        tableView.getItems().remove(0,tableView.getItems().size());
+        tableView.setItems(interpreter.convertToMemoryData());
+        tableView.refresh();
     }
 
 }

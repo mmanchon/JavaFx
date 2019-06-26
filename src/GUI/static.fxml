@@ -15,7 +15,7 @@
             <TableColumn fx:id="variableValue" prefWidth="75.0" text="Value" />
         </columns>
     </TableView>
-   <Button mnemonicParsing="false" prefHeight="31.0" prefWidth="303.0" text="Next Line" textAlignment="CENTER" />
+   <Button onAction="#nextLine" mnemonicParsing="false" prefHeight="31.0" prefWidth="303.0" text="Next Line" textAlignment="CENTER" />
    <padding>
       <Insets top="10.0" />
    </padding>

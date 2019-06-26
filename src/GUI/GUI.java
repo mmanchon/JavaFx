@@ -32,7 +32,7 @@ public class GUI extends Application {
         }else{
 
             this.interpreter = new Interpreter(list.get(0));
-            this.interpreter.start();
+            //this.interpreter.start();
             this.staticStage = primaryStage;
 
             initStaticMemoryLayout();

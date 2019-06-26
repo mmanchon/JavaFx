@@ -15,7 +15,7 @@ public class Headers {
         this.symbolTable = symbolTable;
     }
 
-    public SymbolTable readMainHeader(Token token, SymbolTable symbolTable){
+    public Token readMainHeader(Token token, SymbolTable symbolTable){
         this.symbolTable = symbolTable;
 
         while(token.getId() != Type.OPEN_KEY){
@@ -23,6 +23,6 @@ public class Headers {
         }
 
         token = this.reader.extractToken();
-        return this.symbolTable;
+        return token;
     }
 }

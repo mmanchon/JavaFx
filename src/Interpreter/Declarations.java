@@ -17,18 +17,21 @@ public class Declarations {
         this.symbolTable = symbolTable;
     }
 
-    public SymbolTable readDeclarations(Token token, SymbolTable symbolTable){
+    public Token readDeclarations(Token token, SymbolTable symbolTable){
         this.symbolTable = symbolTable;
         Variable variable;
         ITypes iTypes;
 
-        while(token.getId() == Type.INT){
+        while(token.getId() == Type.LINE_BREAK){
+            token = this.reader.extractToken();
+        }
+
+        if(token.getId() == Type.INT){
             while(token.getId() != Type.SEMICOLON){
                 variable = new Variable();
                 token = this.reader.extractToken();
 
                 variable.setName(token.getLexema());
-                System.out.println(token.getStringToken());
                 variable.setType(new ITypes("int",4,0));
 
                 token = this.reader.extractToken();
@@ -56,6 +59,6 @@ public class Declarations {
 
 
 
-        return this.symbolTable;
+        return token;
     }
 }

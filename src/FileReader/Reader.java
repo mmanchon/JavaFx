@@ -87,6 +87,9 @@ public class Reader {
                         break;
                     case SPACE:
                         this.character = this.bufferedReader.read();
+                        if(this.character == '\n'){
+                            token.setId(Type.LINE_BREAK);
+                        }
                         break;
                     case RELATIONALS:
                         if (this.character == '=') {

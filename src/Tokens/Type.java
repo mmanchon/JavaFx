@@ -40,6 +40,7 @@ public enum Type {
     LONG_CNST,
 
     //Extras
+    LINE_BREAK,
     NULL,
     EOF
 }
