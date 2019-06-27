@@ -1,9 +1,8 @@
 package Interpreter;
 
 import FileReader.Reader;
-import SymbolTable.SymbolTable;
-import SymbolTable.ITypes;
-import SymbolTable.Variable;
+import SymbolTable.*;
+
 import Tokens.Token;
 import Tokens.Type;
 
@@ -21,32 +20,53 @@ public class Declarations {
         this.symbolTable = symbolTable;
         Variable variable;
         ITypes iTypes;
-
-        while(token.getId() == Type.LINE_BREAK){
-            token = this.reader.extractToken();
-        }
+        ArrayType arrayType;
 
         if(token.getId() == Type.INT){
             while(token.getId() != Type.SEMICOLON){
                 variable = new Variable();
                 token = this.reader.extractToken();
+                if(token.getId() == Type.ID_POINTER){
 
+                    iTypes = new PointerVariable();
+                    iTypes.setSize(4);
+                    iTypes.setName("int_pointer");
+
+                }else{
+                    iTypes = new ITypes("int",4,0);
+                }
                 variable.setName(token.getLexema());
-                variable.setType(new ITypes("int",4,0));
 
                 token = this.reader.extractToken();
 
-                if(token.getId() != Type.COMMA){
-                    if(token.getId() == Type.EQUAL){
+                //Si es una asignacion de variable
+                if(token.getId() == Type.EQUAL || token.getId() == Type.COMMA || token.getId() == Type.SEMICOLON) {
+                    variable.setType(iTypes);
+
+                    if (token.getId() != Type.COMMA && token.getId() != Type.SEMICOLON) {
+                        if (token.getId() == Type.EQUAL) {
+                            token = this.reader.extractToken();
+
+                            iTypes = variable.getType();
+                            iTypes.setValue(token.getLexema());
+
+                            variable.setType(iTypes);
+                        }
+
                         token = this.reader.extractToken();
-
-                        iTypes = variable.getType();
-                        iTypes.setValue(token.getLexema());
-
-                        variable.setType(iTypes);
                     }
 
+                    //Si accedemos a un array
+                }else if( token.getId() == Type.OPEN_BRA){
                     token = this.reader.extractToken();
+
+                    arrayType = new ArrayType(0,new Integer(token.getLexema()));
+                    arrayType.setName("int_array");
+                    arrayType.setSize(4);
+                    variable.setType(arrayType);
+                    token = this.reader.extractToken();
+                    token = this.reader.extractToken();
+
                 }
 
                 this.symbolTable.getNode(this.symbolTable.getActualNode()).addVariable(variable);

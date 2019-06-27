@@ -12,10 +12,10 @@
     </padding>
     <TableView fx:id="tableView" GridPane.columnIndex="0" GridPane.rowIndex="1" editable="true">
         <columns>
-            <TableColumn fx:id="variableName" prefWidth="75.0" text="Name" />
-            <TableColumn fx:id="variableSize" prefWidth="75.0" text="Type" />
-            <TableColumn fx:id="variableValue" prefWidth="75.0" text="Value" />
-            <TableColumn fx:id="variableOffset" prefWidth="75.0" text="Offset" />
+            <TableColumn fx:id="dynamicOffset" prefWidth="75.0" text="Offset" />
+            <TableColumn fx:id="dynamicName" prefWidth="75.0" text="Name" />
+            <TableColumn fx:id="dynamicSize" prefWidth="75.0" text="Type" />
+            <TableColumn fx:id="dynamicValue" prefWidth="75.0" text="Value" />
         </columns>
     </TableView>
 </GridPane>

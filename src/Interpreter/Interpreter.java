@@ -1,12 +1,10 @@
 package Interpreter;
 
 import FileReader.Reader;
+import GUI.DynamicController;
 import GUI.MemoryRow;
-import SymbolTable.SymbolTable;
-import SymbolTable.Node;
-import SymbolTable.Variable;
-import Tokens.Token;
-import Tokens.Type;
+import SymbolTable.*;
+import Tokens.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -16,17 +14,22 @@ public class Interpreter {
 
     private Headers headers;
     private Declarations declarations;
+    private Instructions instructions;
 
     private SymbolTable symbolTable = new SymbolTable();
     private ObservableList<MemoryRow> memoryRows;
-
+    private DynamicController dynamicController;
     private Token token = new Token();
 
     public Interpreter (String filename){
         this.reader = new Reader(filename);
+        this.symbolTable.addNode(new Node());
+
         this.headers = new Headers(reader,symbolTable);
         this.declarations = new Declarations(reader,symbolTable);
-        this.symbolTable.addNode(new Node());
+        this.declarations = new Declarations(reader,symbolTable);
+        this.instructions = new Instructions(reader,symbolTable);
+
         token = this.headers.readMainHeader(token,symbolTable);
         this.memoryRows = FXCollections.observableArrayList();
 
@@ -58,13 +61,21 @@ public class Interpreter {
     }
 
     public void analiseNextLine(){
-        System.out.println(this.token.getStringToken());
-        this.token = this.reader.extractToken();
-        this.token = this.declarations.readDeclarations(token,symbolTable);
-        if(token.getId() != Type.EOF && token.getId() == Type.LINE_BREAK){
-//            token = this.reader.extractToken();
+        //if(this.token.getId() != Type.LINE_BREAK)this.token = this.reader.extractToken();
+        while(token.getId() == Type.LINE_BREAK){
+            token = this.reader.extractToken();
         }
-        System.out.println(this.token.getStringToken());
+
+      //  System.out.println("Antes" + this.token.getStringToken());
+        if(token.getId() == Type.ID)this.token = this.instructions.readInstruction(this.token,this.symbolTable);
+        if(token.getId() == Type.INT) this.token = this.declarations.readDeclarations(token,symbolTable);
+
+    //    System.out.println("Middle" + this.token.getStringToken());
+
+//        if(token.getId() != Type.EOF){
+         //   if(this.token.getId() != Type.LINE_BREAK) token = this.reader.extractToken();
+  //      }
+        //System.out.println("Despues" + this.token.getStringToken());
 
         /*while (token.getId() != Type.EOF){
             // System.out.println(token.getStringToken());
@@ -78,10 +89,32 @@ public class Interpreter {
         Variable variable;
         int offset = -4;
         this.memoryRows.removeAll();
+
         for(int i = 0; i < node.getVariablesList().size(); i++){
             variable = (Variable) node.getVariablesList().values().toArray()[i];
-            this.memoryRows.add(new MemoryRow(variable.getName(),variable.getType().getValue().toString(),variable.getType().getName(),'@' + String.valueOf(offset + variable.getType().getSize())));
-            offset+=variable.getType().getSize();
+             if(variable.getType() instanceof  PointerVariable){
+
+                 if(((PointerVariable) variable.getType()).isHasMemory()){
+                     offset+=variable.getType().getSize();
+                     this.memoryRows.add(new MemoryRow(variable.getName(),"@"+(offset+variable.getType().getSize()),variable.getType().getName(),'@' + String.valueOf(offset)));
+                     this.dynamicController.updateRows(variable, offset);
+                 }else{
+                     offset+=variable.getType().getSize();
+                     this.memoryRows.add(new MemoryRow(variable.getName(),variable.getType().getValue().toString(),variable.getType().getName(),'@' + String.valueOf(offset )));
+                 }
+
+            }else if((variable.getType() instanceof ArrayType)){
+
+                 for(int j = 0; j < ((ArrayType)variable.getType()).getMaxPosition(); j++){
+                     offset+=variable.getType().getSize();
+                     this.memoryRows.add(new MemoryRow(variable.getName()+"["+j+"]",((ArrayType)variable.getType()).getElement(j).toString(),variable.getType().getName(),'@' + String.valueOf(offset )));
+                 }
+
+             }else{
+                 offset+=variable.getType().getSize();
+                this.memoryRows.add(new MemoryRow(variable.getName(),variable.getType().getValue().toString(),variable.getType().getName(),'@' + String.valueOf(offset)));
+            }
+
         }
 
         return this.memoryRows;
@@ -93,5 +126,9 @@ public class Interpreter {
 
     public void setToken(Token token) {
         this.token = token;
+    }
+
+    public void setDynamicController(DynamicController dynamicController){
+        this.dynamicController =  dynamicController;
     }
 }

@@ -89,7 +89,7 @@ public class GUI extends Application {
 
         DynamicController controller = (DynamicController) loader.getController();
         controller.setInterpreter(this.interpreter);
-
+        this.interpreter.setDynamicController(controller);
         // Show the scene containing the root layout.
         Scene scene = new Scene(dynamicPane, 400, 800);
 

@@ -61,7 +61,7 @@ public class Reader {
 
                         break;
                     case ID_POINTER:
-                        token.appendCharToString((char) character);
+                        //token.appendCharToString((char) character);
                         this.character = this.bufferedReader.read();
 
                         while (detectCase((char) this.character) == ID) {
