@@ -4,6 +4,7 @@ public class ITypes {
 
     private String name;
     private int size;
+    private int offset;
     private Object value;
 
     public ITypes(){
@@ -12,10 +13,11 @@ public class ITypes {
         this.value = new Object();
     }
 
-    public ITypes(String name, int size, Object value){
+    public ITypes(String name, int size, Object value, int offset){
         this.name = name;
         this.size = size;
         this.value = value;
+        this.offset = offset;
     }
 
     public Object getValue() {
@@ -40,6 +42,14 @@ public class ITypes {
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    public int getOffset() {
+        return offset;
+    }
+
+    public void setOffset(int offset) {
+        this.offset = offset;
     }
 
     @Override

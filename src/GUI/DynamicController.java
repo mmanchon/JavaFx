@@ -57,14 +57,13 @@ public class DynamicController {
 
     }
 
-    public void updateRows(Variable variable, int offset){
+    public void updateRows(Variable variable){
         PointerVariable pointerVariable = (PointerVariable) variable.getType();
         this.memoryRows.removeAll();
         tableView.getItems().remove(0,tableView.getItems().size());
         // System.out.println("Hola");
         for(int i = 0; i < pointerVariable.getMaxPosition(); i++){
-            this.memoryRows.add(new MemoryRow(variable.getName()+"["+i+"]",((ArrayType)variable.getType()).getElement(i).toString(),variable.getType().getName().split("_")[0],'@' + String.valueOf(offset + variable.getType().getSize())));
-            offset+=variable.getType().getSize();
+            this.memoryRows.add(new MemoryRow(variable.getName()+"["+i+"]",((ArrayType)variable.getType()).getElement(i).toString(),variable.getType().getName().split("_")[0],'@' + "@" + variable.getType().getOffset()));
         }
 
         tableView.setItems(this.memoryRows);

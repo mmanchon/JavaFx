@@ -48,7 +48,7 @@ public class Instructions {
 
                     }
 
-                    pointerVariable = new PointerVariable(0,new Integer(token.getLexema()), true);
+                    pointerVariable = new PointerVariable(variable.getName(),0,new Integer(token.getLexema()), true);
                     pointerVariable.setName("int_pointer");
                     pointerVariable.setSize(4);
                     pointerVariable.setHasMemory(true);

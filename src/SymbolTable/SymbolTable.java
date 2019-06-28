@@ -5,11 +5,15 @@ import java.util.Vector;
 public class SymbolTable {
 
     private int actualNode;
+    private int staticOffset;
+    private int dynamicOffset;
 
     private Vector nodeList = new Vector();
 
     public SymbolTable(){
         this.actualNode = 0;
+        this.staticOffset = -4;
+        this.dynamicOffset = -4;
     }
 
     public void addNode(Node node){ this.nodeList.add(node);}
@@ -22,6 +26,30 @@ public class SymbolTable {
 
     public void setActualNode(int actualNode){
         this.actualNode = actualNode;
+    }
+
+    public int getStaticOffset() {
+        return staticOffset;
+    }
+
+    public void setStaticOffset(int staticOffset) {
+        this.staticOffset = staticOffset;
+    }
+
+    public int getDynamicOffset() {
+        return dynamicOffset;
+    }
+
+    public void setDynamicOffset(int dynamicOffset) {
+        this.dynamicOffset = dynamicOffset;
+    }
+
+    public Vector getNodeList() {
+        return nodeList;
+    }
+
+    public void setNodeList(Vector nodeList) {
+        this.nodeList = nodeList;
     }
 
     @Override

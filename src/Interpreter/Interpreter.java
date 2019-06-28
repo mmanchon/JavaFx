@@ -35,59 +35,23 @@ public class Interpreter {
 
     }
 
-    public SymbolTable start(){
-  /*      Token token;
-
-        token = this.reader.extractToken();
-
-
-        this.symbolTable = this.headers.readMainHeader(token,symbolTable);
-        this.symbolTable = this.declarations.readDeclarations(token,symbolTable);
-
-
-        while (token.getId() != Type.EOF){
-          // System.out.println(token.getStringToken());
-           token = this.reader.extractToken();
-        }
-
-      GUI gui = new GUI();
-         gui.start(GUI.classStage);
-         Application.launch(GUI.class, args);
-*/
-        this.reader.closeFile();
-
-        return this.symbolTable;
-
-    }
 
     public void analiseNextLine(){
-        //if(this.token.getId() != Type.LINE_BREAK)this.token = this.reader.extractToken();
+
         while(token.getId() == Type.LINE_BREAK){
             token = this.reader.extractToken();
         }
 
-      //  System.out.println("Antes" + this.token.getStringToken());
         if(token.getId() == Type.ID)this.token = this.instructions.readInstruction(this.token,this.symbolTable);
         if(token.getId() == Type.INT) this.token = this.declarations.readDeclarations(token,symbolTable);
 
-    //    System.out.println("Middle" + this.token.getStringToken());
-
-//        if(token.getId() != Type.EOF){
-         //   if(this.token.getId() != Type.LINE_BREAK) token = this.reader.extractToken();
-  //      }
-        //System.out.println("Despues" + this.token.getStringToken());
-
-        /*while (token.getId() != Type.EOF){
-            // System.out.println(token.getStringToken());
-            token = this.reader.extractToken();
-        }*/
 
     }
 
     public  ObservableList<MemoryRow> convertToMemoryData(){
         Node node = this.symbolTable.getNode(this.symbolTable.getActualNode());
         Variable variable;
-        int offset = -4;
+       // int offset = -4;
         this.memoryRows.removeAll();
 
         for(int i = 0; i < node.getVariablesList().size(); i++){
@@ -95,24 +59,21 @@ public class Interpreter {
              if(variable.getType() instanceof  PointerVariable){
 
                  if(((PointerVariable) variable.getType()).isHasMemory()){
-                     offset+=variable.getType().getSize();
-                     this.memoryRows.add(new MemoryRow(variable.getName(),"@"+(offset+variable.getType().getSize()),variable.getType().getName(),'@' + String.valueOf(offset)));
-                     this.dynamicController.updateRows(variable, offset);
+                     this.memoryRows.add(new MemoryRow(variable.getName(),"@"+(variable.getType().getOffset()),variable.getType().getName(),"@" + variable.getType().getOffset()));
+                     this.dynamicController.updateRows(variable);
                  }else{
-                     offset+=variable.getType().getSize();
-                     this.memoryRows.add(new MemoryRow(variable.getName(),variable.getType().getValue().toString(),variable.getType().getName(),'@' + String.valueOf(offset )));
+                     this.memoryRows.add(new MemoryRow(variable.getName(),variable.getType().getValue().toString(),variable.getType().getName(),"@" + variable.getType().getOffset()));
                  }
 
             }else if((variable.getType() instanceof ArrayType)){
-
+                Variable variableArray;
                  for(int j = 0; j < ((ArrayType)variable.getType()).getMaxPosition(); j++){
-                     offset+=variable.getType().getSize();
-                     this.memoryRows.add(new MemoryRow(variable.getName()+"["+j+"]",((ArrayType)variable.getType()).getElement(j).toString(),variable.getType().getName(),'@' + String.valueOf(offset )));
+                     variableArray = ((ArrayType)variable.getType()).getElement(j);
+                     this.memoryRows.add(new MemoryRow(variableArray.getName(),(variableArray.getType().getValue()).toString(),variableArray.getType().getName(),"@" + variableArray.getType().getOffset()));
                  }
 
              }else{
-                 offset+=variable.getType().getSize();
-                this.memoryRows.add(new MemoryRow(variable.getName(),variable.getType().getValue().toString(),variable.getType().getName(),'@' + String.valueOf(offset)));
+                this.memoryRows.add(new MemoryRow(variable.getName(),variable.getType().getValue().toString(),variable.getType().getName(),"@" + variable.getType().getOffset()));
             }
 
         }
