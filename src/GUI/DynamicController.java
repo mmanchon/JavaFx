@@ -11,6 +11,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
 
+import java.util.Comparator;
+
 public class DynamicController {
 
     @FXML
@@ -57,14 +59,10 @@ public class DynamicController {
 
     }
 
-    public void updateRows(Variable variable){
-        PointerVariable pointerVariable = (PointerVariable) variable.getType();
-        this.memoryRows.removeAll();
-        tableView.getItems().remove(0,tableView.getItems().size());
-        // System.out.println("Hola");
-        for(int i = 0; i < pointerVariable.getMaxPosition(); i++){
-            this.memoryRows.add(new MemoryRow(variable.getName()+"["+i+"]",((ArrayType)variable.getType()).getElement(i).toString(),variable.getType().getName().split("_")[0],'@' + "@" + variable.getType().getOffset()));
-        }
+    public void updateList(ObservableList<MemoryRow> list){
+        this.memoryRows = list;
+        Comparator<MemoryRow> comparator = Comparator.comparing(MemoryRow::getOffsetInt);
+        this.memoryRows.sort(comparator);
 
         tableView.setItems(this.memoryRows);
         tableView.refresh();

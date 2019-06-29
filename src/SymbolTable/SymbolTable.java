@@ -13,7 +13,7 @@ public class SymbolTable {
     public SymbolTable(){
         this.actualNode = 0;
         this.staticOffset = -4;
-        this.dynamicOffset = -4;
+        this.dynamicOffset = 0;
     }
 
     public void addNode(Node node){ this.nodeList.add(node);}

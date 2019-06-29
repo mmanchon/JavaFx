@@ -8,8 +8,8 @@ public class PointerVariable extends ArrayType {
     public PointerVariable(){
     }
 
-    public PointerVariable(String name, int minPosition, int maxPosition, boolean hasMemory) {
-        super(name, minPosition, maxPosition);
+    public PointerVariable(String varName, String name, int size, Object value, int offset, int minPosition, int maxPosition, boolean hasMemory) {
+        super(varName,name,size,value,offset,maxPosition,minPosition);
         this.hasMemory = hasMemory;
 
     }

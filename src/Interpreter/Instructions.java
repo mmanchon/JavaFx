@@ -5,6 +5,8 @@ import SymbolTable.*;
 import Tokens.Token;
 import Tokens.Type;
 
+import java.util.Random;
+
 public class Instructions {
 
     private Reader reader;
@@ -37,10 +39,6 @@ public class Instructions {
 
                     variable.setType(iTypes);
 
-                  //  this.symbolTable.getNode(this.symbolTable.getActualNode()).addVariable(variable);
-
-                  //  token = this.reader.extractToken();
-
                 }else if(token.getId() == Type.MALLOC){
 
                     while (token.getId() != Type.INT_CNST){
@@ -48,10 +46,9 @@ public class Instructions {
 
                     }
 
-                    pointerVariable = new PointerVariable(variable.getName(),0,new Integer(token.getLexema()), true);
-                    pointerVariable.setName("int_pointer");
-                    pointerVariable.setSize(4);
-                    pointerVariable.setHasMemory(true);
+                    pointerVariable = new PointerVariable(variable.getName(),"int_pointer",variable.getType().getSize(),(new Random()).nextInt(10000000),this.symbolTable.getDynamicOffset(),0,new Integer(token.getLexema()), true);
+                    pointerVariable.setOffset(variable.getType().getOffset());
+                    this.symbolTable.setDynamicOffset(this.symbolTable.getDynamicOffset()+(variable.getType().getSize()*(new Integer(token.getLexema()))));
                     variable.setType(pointerVariable);
 
                     token = this.reader.extractToken();
@@ -69,13 +66,14 @@ public class Instructions {
                 int index = Integer.valueOf(token.getLexema());
 
                 token = this.reader.extractToken();
-                while (token.getId() != Type.INT_CNST){
-                    token = this.reader.extractToken();
-                }
+                token = this.reader.extractToken();
+                token = this.reader.extractToken();
 
                 arrayType = (ArrayType) variable.getType();
 
-                arrayType.setElement(index,token.getLexema());
+                if (token.getId() == Type.INT_CNST){
+                    arrayType.setElement(index,token.getLexema());
+                }
 
                 this.symbolTable.getNode(this.symbolTable.getActualNode()).addVariable(variable);
 

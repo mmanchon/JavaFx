@@ -42,10 +42,10 @@ public class Declarations {
 
             if (token.getId() == Type.ID_POINTER) {
 
-                iTypes = createIntVariable("", "int_pointer", this.symbolTable.getStaticOffset() + 4, 4, "@" + random.nextInt(10000000), 0);
+                iTypes = createIntVariable(token.getLexema(), "int_pointer", this.symbolTable.getStaticOffset() + 4, 4, "@" + random.nextInt(10000000), 0);
             } else {
 
-                iTypes = createIntVariable("", "int", this.symbolTable.getStaticOffset() + 4, 4, random.nextInt(10000000), 0);
+                iTypes = createIntVariable(token.getLexema(), "int", this.symbolTable.getStaticOffset() + 4, 4, random.nextInt(10000000), 0);
             }
 
             this.symbolTable.setStaticOffset(this.symbolTable.getStaticOffset() + iTypes.getSize());
@@ -113,9 +113,8 @@ public class Declarations {
             return iTypes;
 
         } else if (typeName.equals("int_array")) {
-            System.out.println("Offset antes" + offset);
             ArrayType arrayType = new ArrayType(varName, typeName, size, value, offset, maxLength, 0);
-            System.out.println("Offset despues" + offset);
+            this.symbolTable.setStaticOffset(this.symbolTable.getStaticOffset()+(size*maxLength));
             return arrayType;
         }
 

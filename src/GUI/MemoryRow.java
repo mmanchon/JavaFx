@@ -67,4 +67,9 @@ public class MemoryRow {
     public void setOffset(String offset) {
         this.offset.set(offset);
     }
+
+    public int getOffsetInt(){
+        String offset = String.valueOf(this.offset);
+        return new Integer(offset.split("@")[1].split("]")[0]);
+    }
 }
