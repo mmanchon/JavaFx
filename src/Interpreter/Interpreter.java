@@ -3,6 +3,7 @@ package Interpreter;
 import FileReader.Reader;
 import GUI.DynamicController;
 import GUI.MemoryRow;
+import GUI.StaticController;
 import SymbolTable.*;
 import Tokens.*;
 import javafx.collections.FXCollections;
@@ -23,7 +24,7 @@ public class Interpreter {
     private ObservableList<MemoryRow> memoryRows = FXCollections.observableArrayList();
     private ObservableList<MemoryRow> dynamicMemoryRows = FXCollections.observableArrayList();
 
-    private DynamicController dynamicController;
+    private StaticController dynamicController;
     private Token token = new Token();
 
     public Interpreter (String filename){
@@ -87,8 +88,8 @@ public class Interpreter {
 
         Comparator<MemoryRow> comparator = Comparator.comparing(MemoryRow::getOffsetInt);
         this.memoryRows.sort(comparator);
-
-        this.dynamicController.updateList(this.dynamicMemoryRows);
+        this.dynamicMemoryRows.sort(comparator);
+       // this.dynamicController.updateList(this.dynamicMemoryRows);
 
         return this.memoryRows;
     }
@@ -103,11 +104,12 @@ public class Interpreter {
         }
 
     }
-    public void setDynamicController(DynamicController dynamicController){
+    public void setDynamicController(StaticController dynamicController){
         this.dynamicController =  dynamicController;
     }
 
-    public  ObservableList<MemoryRow> getDynamicMemoryRows(){
+    public ObservableList<MemoryRow> getDynamicMemoryRows(){
         return this.dynamicMemoryRows;
     }
+
 }

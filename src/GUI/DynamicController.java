@@ -27,8 +27,6 @@ public class DynamicController {
     public TableView tableView;
 
     private ObservableList<MemoryRow> memoryRows = FXCollections.observableArrayList();
-    private GUI gui;
-    private Interpreter interpreter;
 
     /**
      * The constructor.
@@ -47,9 +45,6 @@ public class DynamicController {
         dynamicOffset.setCellValueFactory(cellData -> cellData.getValue().offsetProperty());
     }
 
-    public void setInterpreter(Interpreter interpreter){
-        this.interpreter = interpreter;
-    }
 
     public void setMaxHeightWidth(Stage stage){
         // We bind the prefHeight- and prefWidthProperty to the height and width of the stage.

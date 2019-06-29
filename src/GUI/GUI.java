@@ -2,12 +2,10 @@ package GUI;
 
 import Interpreter.Interpreter;
 import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -15,11 +13,10 @@ import java.util.List;
 
 public class GUI extends Application {
 
-    private GridPane rootLayout;
-    private Stage staticStage;
-    private Stage dynamicStage;
+    private Pane rootLayout;
+    private Stage stage;
+   // private Stage dynamicStage;
 
-    private ObservableList<MemoryRow> memoryRows = FXCollections.observableArrayList();
     private Interpreter interpreter;
 
     @Override
@@ -33,10 +30,10 @@ public class GUI extends Application {
 
             this.interpreter = new Interpreter(list.get(0));
             //this.interpreter.start();
-            this.staticStage = primaryStage;
+            this.stage = primaryStage;
 
             initStaticMemoryLayout();
-            initDynamicStage();
+            //initDynamicStage();
 
         }
 
@@ -55,30 +52,32 @@ public class GUI extends Application {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("static.fxml"));
 
-        rootLayout = (GridPane) loader.load();
+        rootLayout = loader.load();
 
         StaticController staticController = (StaticController) loader.getController();
         staticController.setInterpreter(this.interpreter);
+        this.interpreter.setDynamicController(staticController);
 
         // Show the scene containing the root layout.
-        Scene scene = new Scene(rootLayout, 400, 500);
+        Scene scene = new Scene(rootLayout);
         Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
+      //  stage.setX(stage.getWidth());
+      //  stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 4);
+        // this.stage.setX((primScreenBounds.getWidth() - this.stage.getWidth()) / 2);
+      //  this.stage.setY((primScreenBounds.getHeight() - this.stage.getHeight()) / 4);
+        this.stage.setTitle("Memory Debug");
+        this.stage.setScene(scene);
 
-        this.staticStage.setX((primScreenBounds.getWidth() - this.staticStage.getWidth()) / 2);
-        this.staticStage.setY((primScreenBounds.getHeight() - this.staticStage.getHeight()) / 4);
-        this.staticStage.setTitle("Program Static Memory");
-        this.staticStage.setScene(scene);
+       // staticController.setMaxWidth(this.stage);
 
-       // staticController.setMaxWidth(this.staticStage);
-
-        this.staticStage.show();
+        this.stage.show();
     }
 
     /**
      * Initializes the root layout.
      */
 
-    public void initDynamicStage() throws Exception{
+   /* public void initDynamicStage() throws Exception{
         this.dynamicStage = new Stage();
 
         // Load root layout from fxml file.
@@ -88,8 +87,7 @@ public class GUI extends Application {
         GridPane dynamicPane = (GridPane) loader.load();
 
         DynamicController controller = (DynamicController) loader.getController();
-        controller.setInterpreter(this.interpreter);
-        this.interpreter.setDynamicController(controller);
+      //  this.interpreter.setDynamicController(controller);
         // Show the scene containing the root layout.
         Scene scene = new Scene(dynamicPane, 400, 800);
 
@@ -101,25 +99,7 @@ public class GUI extends Application {
 
         this.dynamicStage.show();
 
-    }
-
-
-    /**
-     * Returns the main stage.
-     * @return
-     */
-
-    public Stage getStaticStage() {
-        return staticStage;
-    }
-
-    /**
-     * Returns the data as an observable list of Persons.
-     * @return
-     */
-    public ObservableList<MemoryRow> getMemoryData() {
-        return memoryRows;
-    }
+    }*/
 
     public Interpreter getInterpreter(){ return this.interpreter;}
 
