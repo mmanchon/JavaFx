@@ -1,12 +1,10 @@
-package GUI;
-
+import GUI.Controllers.StaticController;
+import GUI.Models.Editor;
 import Interpreter.Interpreter;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.util.List;
@@ -21,21 +19,20 @@ public class GUI extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parameters params = getParameters();
+        /*Parameters params = getParameters();
         List<String> list = params.getRaw();
 
         if(list.size() != 1){
             System.out.println("ERROR: Numero de argumentos invalido");
-        }else{
+        }else{*/
 
-            this.interpreter = new Interpreter(list.get(0));
-            //this.interpreter.start();
+            this.interpreter = new Interpreter();
             this.stage = primaryStage;
 
             initStaticMemoryLayout();
             //initDynamicStage();
 
-        }
+        //}
 
     }
 
@@ -50,25 +47,18 @@ public class GUI extends Application {
     public void initStaticMemoryLayout() throws Exception{
         // Load root layout from fxml file.
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("static.fxml"));
+        loader.setLocation(getClass().getResource("GUI/Interface/static.fxml"));
 
         rootLayout = loader.load();
 
         StaticController staticController = (StaticController) loader.getController();
         staticController.setInterpreter(this.interpreter);
-        this.interpreter.setDynamicController(staticController);
+        staticController.setEditor(new Editor());
 
-        // Show the scene containing the root layout.
         Scene scene = new Scene(rootLayout);
-        Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
-      //  stage.setX(stage.getWidth());
-      //  stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 4);
-        // this.stage.setX((primScreenBounds.getWidth() - this.stage.getWidth()) / 2);
-      //  this.stage.setY((primScreenBounds.getHeight() - this.stage.getHeight()) / 4);
+
         this.stage.setTitle("Memory Debug");
         this.stage.setScene(scene);
-
-       // staticController.setMaxWidth(this.stage);
 
         this.stage.show();
     }

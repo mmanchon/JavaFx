@@ -1,4 +1,4 @@
-package SymbolTable;
+package Interpreter.SymbolTable;
 
 import java.util.Vector;
 
@@ -8,12 +8,13 @@ public class SymbolTable {
     private int staticOffset;
     private int dynamicOffset;
 
-    private Vector nodeList = new Vector();
+    private Vector nodeList;
 
     public SymbolTable(){
         this.actualNode = 0;
         this.staticOffset = -4;
         this.dynamicOffset = 0;
+        this.nodeList = new Vector();
     }
 
     public void addNode(Node node){ this.nodeList.add(node);}
@@ -52,6 +53,11 @@ public class SymbolTable {
         this.nodeList = nodeList;
     }
 
+
+    public void removeNode(int index){
+        this.nodeList.remove(this.getNode(index));
+    }
+
     @Override
     public String toString(){
         String result = "<TaulaSimbols>\n";
@@ -62,5 +68,12 @@ public class SymbolTable {
         result += "</TaulaSimbols>";
         return result;
 
+    }
+
+    public void deleteAllData(){
+        for(int i = 0; i < this.actualNode+1; i++){
+            ((Node)this.nodeList.get(i)).deleteAllData();
+        }
+        this.actualNode = 0;
     }
 }

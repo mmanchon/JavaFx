@@ -1,0 +1,10 @@
+.root {
+    -fx-background-color: darkgrey;
+}
+.label {
+    -fx-font-size: 20;
+}
+
+.text-area{
+    -fx-highlight-fill: lightgray; -fx-highlight-text-fill: firebrick; -fx-font-size: 12px;
+}

@@ -1,9 +1,6 @@
-package GUI;
+package GUI.Controllers;
 
-import Interpreter.Interpreter;
-import SymbolTable.ArrayType;
-import SymbolTable.PointerVariable;
-import SymbolTable.Variable;
+import GUI.Models.MemoryRow;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

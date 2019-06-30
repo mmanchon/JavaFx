@@ -1,4 +1,4 @@
-package GUI;
+package GUI.Models;
 
 import javafx.beans.property.SimpleStringProperty;
 
@@ -7,8 +7,6 @@ public class MemoryRow {
     private final SimpleStringProperty size = new SimpleStringProperty();
     private final SimpleStringProperty value = new SimpleStringProperty();
     private final SimpleStringProperty offset = new SimpleStringProperty();
-
-
 
     public MemoryRow(String name,
                       String value,

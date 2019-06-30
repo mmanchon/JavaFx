@@ -1,4 +1,4 @@
-package Tokens;
+package Interpreter.Tokens;
 
 public class Token {
 

@@ -1,10 +1,10 @@
 package Interpreter;
 
-import FileReader.Reader;
-import SymbolTable.*;
+import Interpreter.FileReader.Reader;
+import Interpreter.SymbolTable.*;
 
-import Tokens.Token;
-import Tokens.Type;
+import Interpreter.Tokens.Token;
+import Interpreter.Tokens.Type;
 
 import java.util.Random;
 
@@ -36,64 +36,65 @@ public class Declarations {
         ITypes iTypes;
         Random random = new Random();
 
-        while (token.getId() != Type.SEMICOLON) {
-            variable = new Variable();
-            token = this.reader.extractToken();
+        if(token.getId() == Type.INT) {
+            while (token.getId() != Type.SEMICOLON) {
+                variable = new Variable();
+                token = this.reader.extractToken();
 
-            if (token.getId() == Type.ID_POINTER) {
+                if (token.getId() == Type.ID_POINTER) {
 
-                iTypes = createIntVariable(token.getLexema(), "int_pointer", this.symbolTable.getStaticOffset() + 4, 4, "@" + random.nextInt(10000000), 0);
-            } else {
+                    iTypes = createIntVariable(token.getLexema(), "int_pointer", this.symbolTable.getStaticOffset() + 4, 4, "@" + random.nextInt(10000000), 0);
+                } else {
 
-                iTypes = createIntVariable(token.getLexema(), "int", this.symbolTable.getStaticOffset() + 4, 4, random.nextInt(10000000), 0);
-            }
-
-            this.symbolTable.setStaticOffset(this.symbolTable.getStaticOffset() + iTypes.getSize());
-            variable.setType(iTypes);
-            variable.setName(token.getLexema());
-
-            token = this.reader.extractToken();
-
-            //Si es una asignacion de variable
-            if (token.getId() == Type.EQUAL || token.getId() == Type.COMMA || token.getId() == Type.SEMICOLON) {
-
-                if (token.getId() != Type.COMMA && token.getId() != Type.SEMICOLON) {
-
-                    if (token.getId() == Type.EQUAL) {
-                        token = this.reader.extractToken();
-
-                        iTypes = variable.getType();
-
-                        if (token.getId() == Type.INT_CNST) {
-                            iTypes.setValue(token.getLexema());
-                            variable.setType(iTypes);
-                        }else{
-                            iTypes.setValue(token.getLexema());
-                            variable.setType(iTypes);
-                        }
-                    }
-
-                    token = this.reader.extractToken();
+                    iTypes = createIntVariable(token.getLexema(), "int", this.symbolTable.getStaticOffset() + 4, 4, random.nextInt(10000000), 0);
                 }
 
-                //Si accedemos a un array
-            } else if (token.getId() == Type.OPEN_BRA) {
+                this.symbolTable.setStaticOffset(this.symbolTable.getStaticOffset() + iTypes.getSize());
+                variable.setType(iTypes);
+                variable.setName(token.getLexema());
 
                 token = this.reader.extractToken();
 
-                variable.setType(this.createIntVariable(variable.getName(), "int_array", this.symbolTable.getStaticOffset(), 4, 0, new Integer(token.getLexema())));
+                //Si es una asignacion de variable
+                if (token.getId() == Type.EQUAL || token.getId() == Type.COMMA || token.getId() == Type.SEMICOLON) {
 
-                token = this.reader.extractToken();
-                token = this.reader.extractToken();
+                    if (token.getId() != Type.COMMA && token.getId() != Type.SEMICOLON) {
+
+                        if (token.getId() == Type.EQUAL) {
+                            token = this.reader.extractToken();
+
+                            iTypes = variable.getType();
+
+                            if (token.getId() == Type.INT_CNST) {
+                                iTypes.setValue(token.getLexema());
+                                variable.setType(iTypes);
+                            } else {
+                                iTypes.setValue(token.getLexema());
+                                variable.setType(iTypes);
+                            }
+                        }
+
+                        token = this.reader.extractToken();
+                    }
+
+                    //Si accedemos a un array
+                } else if (token.getId() == Type.OPEN_BRA) {
+
+                    token = this.reader.extractToken();
+
+                    variable.setType(this.createIntVariable(variable.getName(), "int_array", this.symbolTable.getStaticOffset(), 4, 0, new Integer(token.getLexema())));
+
+                    token = this.reader.extractToken();
+                    token = this.reader.extractToken();
+
+                }
+
+                this.symbolTable.getNode(this.symbolTable.getActualNode()).addVariable(variable);
 
             }
 
-            this.symbolTable.getNode(this.symbolTable.getActualNode()).addVariable(variable);
-
+            token = this.reader.extractToken();
         }
-
-        token = this.reader.extractToken();
-
         return token;
     }
 

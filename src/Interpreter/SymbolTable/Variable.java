@@ -1,4 +1,4 @@
-package SymbolTable;
+package Interpreter.SymbolTable;
 
 public class Variable {
 
@@ -37,5 +37,7 @@ public class Variable {
         return result;
 
     }
+
+
 
 }

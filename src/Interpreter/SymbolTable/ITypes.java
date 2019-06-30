@@ -1,4 +1,4 @@
-package SymbolTable;
+package Interpreter.SymbolTable;
 
 public class ITypes {
 

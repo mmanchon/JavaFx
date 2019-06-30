@@ -1,4 +1,4 @@
-package Tokens;
+package Interpreter.Tokens;
 
 import java.util.HashMap;
 
@@ -40,6 +40,7 @@ public class Dictionary {
         this.dictionary.put("}",Type.CLOSE_KEY);
         this.dictionary.put(";",Type.SEMICOLON);
         this.dictionary.put(",",Type.COMMA);
+        this.dictionary.put("&",Type.AND);
 
         //Simple instructions
         this.dictionary.put("if",Type.IF);

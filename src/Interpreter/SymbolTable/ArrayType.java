@@ -1,6 +1,5 @@
-package SymbolTable;
+package Interpreter.SymbolTable;
 
-import java.util.Hashtable;
 import java.util.Random;
 import java.util.Vector;
 
@@ -75,6 +74,10 @@ public class ArrayType extends ITypes {
         Variable variable = this.elemntsList.get(index);
         variable.getType().setValue(object);
         this.elemntsList.set(index, variable);
+    }
+
+    public void removeAllElements(){
+        this.elemntsList.removeAllElements();
     }
 
 }

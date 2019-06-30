@@ -1,4 +1,4 @@
-package SymbolTable;
+package Interpreter.SymbolTable;
 
 import java.util.Hashtable;
 
@@ -56,5 +56,11 @@ public class Node {
 
         result += "\t\t</Bloc>\n";
         return result;
+    }
+
+    public void deleteAllData(){
+        this.contantsList.clear();
+        this.variablesList.clear();
+        this.offset = 0;
     }
 }

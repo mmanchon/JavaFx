@@ -1,4 +1,4 @@
-package Tokens;
+package Interpreter.Tokens;
 
 public enum Type {
 
@@ -10,6 +10,7 @@ public enum Type {
     CHAR,
     DOUBLE,
     LONG,
+    STRING,
 
     //Instructions for dynamic memory
     MALLOC,
@@ -27,12 +28,20 @@ public enum Type {
     OPEN_KEY,
     CLOSE_KEY,
     COMMA,
+    AND,
 
     //Instructions
     WHILE,
     DO,
     IF,
     FOR,
+
+
+    //Arithmetic operations
+    PLUS,
+    MINUS,
+    DIVIDE,
+    MULTIPLY,
 
     //Constantes
     INT_CNST,

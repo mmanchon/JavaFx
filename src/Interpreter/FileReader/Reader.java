@@ -1,8 +1,8 @@
-package FileReader;
+package Interpreter.FileReader;
 
-import Tokens.Dictionary;
-import Tokens.Token;
-import Tokens.Type;
+import Interpreter.Tokens.Dictionary;
+import Interpreter.Tokens.Token;
+import Interpreter.Tokens.Type;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -11,6 +11,7 @@ public class Reader {
 
     private BufferedReader bufferedReader;
     private Dictionary dictionary;
+    private String fileName;
 
     private final char ID = 1;
     private final char ID_POINTER = 2;
@@ -19,12 +20,19 @@ public class Reader {
     private final char SPACE = 5;
     private final char SPECIAL = 6;
     private final char RELATIONALS = 7;
-    private final int ERROR = 8;
-
+    private final char ARITHMETIC_SMPL = 8;
+    private final char ARITHMETIC_CMPLX=9;
+    private final int ERROR = 11;
+    private int numLines = 0;
     private int character;
 
-    public Reader(String filename){
+    public Reader(){
+        this.dictionary = new Dictionary();
+    }
 
+    public void openNewFile(String filename){
+        this.fileName = filename;
+        if(this.bufferedReader != null)this.closeFile();
         try {
 
             this.bufferedReader = new BufferedReader(
@@ -32,7 +40,6 @@ public class Reader {
             );
 
             this.character = this.bufferedReader.read();
-            this.dictionary = new Dictionary();
 
         } catch (FileNotFoundException e) {
             System.out.println("Error opening file");
@@ -41,7 +48,6 @@ public class Reader {
             System.out.println("Error while reading character");
             e.printStackTrace();
         }
-
     }
 
     public Token extractToken(){
@@ -89,6 +95,47 @@ public class Reader {
                         this.character = this.bufferedReader.read();
                         if(this.character == '\n'){
                             token.setId(Type.LINE_BREAK);
+                            this.numLines++;
+                        }
+                        break;
+                    case ARITHMETIC_SMPL:
+
+                        if(this.character == '+'){
+                            token.setId(Type.PLUS);
+                        }else if(this.character == '-'){
+                            token.setId(Type.MINUS);
+                        }
+                        token.appendCharToString((char)this.character);
+
+                        this.character = (char) this.bufferedReader.read();
+
+                        break;
+                    case ARITHMETIC_CMPLX:
+
+                        char aux = (char) this.bufferedReader.read();
+
+                        //Miramos que no sea un comentario
+
+                        if (this.character == '/' && aux == '/') {
+
+                            this.character = (char) this.bufferedReader.read();
+
+                            while (this.character != '\n') {
+                                this.character = (char) this.bufferedReader.read();
+                            }
+
+                            this.character = (char) this.bufferedReader.read();
+
+                        } else {
+
+                            if(this.character == '*'){
+                                token.setId(Type.MULTIPLY);
+                            }else if(this.character == '/'){
+                                token.setId(Type.DIVIDE);
+                            }
+                            token.appendCharToString((char)this.character);
+
+                            this.character = aux;
                         }
                         break;
                     case RELATIONALS:
@@ -103,6 +150,21 @@ public class Reader {
                     case SPECIAL:
                         token.appendCharToString((char) this.character);
                         this.character = this.bufferedReader.read();
+                        break;
+                    case DOUBLE_COMAS:
+
+                        token.setId(Type.STRING);
+
+                        this.character = (char) this.bufferedReader.read();
+
+                        while (detectCase((char)this.character) != DOUBLE_COMAS) {
+                            token.appendCharToString((char)this.character);
+                            this.character = (char) this.bufferedReader.read();
+
+                        }
+
+                        this.character = (char) this.bufferedReader.read();
+
                         break;
                     //case DOUBLE_COMAS:
                     //      this.character = this.bufferedReader.read();
@@ -147,11 +209,11 @@ public class Reader {
         } else if (ch.matches("[*]")){
             return ID_POINTER;
         } else if (ch.matches("[<->]|[!]")) {
-            return RELATIONALS;/*
+            return RELATIONALS;
         } else if (ch.matches("[+\\-]")) {
             return ARITHMETIC_SMPL;
         } else if (ch.matches("[*\\/]")) {
-            return ARITHMETIC_CMPLX;*/
+            return ARITHMETIC_CMPLX;
         } else if (ch.matches("[\\(\\);\\[\\]:\\,}\\{\\&]")) {
             return SPECIAL;
         } else if (ch.matches("[ ]|[\0]|[\\t]|[\\n]|[\\r]")) {
@@ -177,5 +239,19 @@ public class Reader {
         }
 
     }
+
+    public void restart(){
+        if(bufferedReader != null){
+            this.closeFile();
+            this.openNewFile(this.fileName);
+            this.numLines = 0;
+        }
+    }
+
+    public int getNumLines(){
+        return this.numLines;
+    }
+
+
 
 }

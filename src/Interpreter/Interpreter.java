@@ -1,15 +1,13 @@
 package Interpreter;
 
-import FileReader.Reader;
-import GUI.DynamicController;
-import GUI.MemoryRow;
-import GUI.StaticController;
-import SymbolTable.*;
-import Tokens.*;
+import Interpreter.FileReader.Reader;
+import GUI.Models.MemoryRow;
+import Interpreter.SymbolTable.*;
+import Interpreter.Tokens.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.util.Collections;
+import java.io.File;
 import java.util.Comparator;
 
 public class Interpreter {
@@ -24,17 +22,19 @@ public class Interpreter {
     private ObservableList<MemoryRow> memoryRows = FXCollections.observableArrayList();
     private ObservableList<MemoryRow> dynamicMemoryRows = FXCollections.observableArrayList();
 
-    private StaticController dynamicController;
     private Token token = new Token();
 
-    public Interpreter (String filename){
-        this.reader = new Reader(filename);
+    public Interpreter (){
+        this.reader = new Reader();
         this.symbolTable.addNode(new Node());
 
         this.headers = new Headers(reader,symbolTable);
         this.declarations = new Declarations(reader,symbolTable);
         this.instructions = new Instructions(reader,symbolTable);
+    }
 
+    public void setNewFile(File file){
+        this.reader.openNewFile(file.getAbsolutePath());
         token = this.headers.readMainHeader(token,symbolTable);
 
     }
@@ -46,8 +46,8 @@ public class Interpreter {
             token = this.reader.extractToken();
         }
 
-        if(token.getId() == Type.ID)this.token = this.instructions.readInstruction(this.token,this.symbolTable);
-        if(token.getId() == Type.INT) this.token = this.declarations.readDeclarations(token,symbolTable);
+        this.token = this.instructions.readInstruction(this.token,this.symbolTable);
+        this.token = this.declarations.readDeclarations(token,symbolTable);
 
 
     }
@@ -66,7 +66,7 @@ public class Interpreter {
                  if(variable.getType() instanceof  PointerVariable){
 
                      if(((PointerVariable) variable.getType()).isHasMemory()){
-                         this.memoryRows.add(new MemoryRow(variable.getName(),"@"+((ArrayType)variable.getType()).getElement(0).getType().getOffset(),variable.getType().getName(),"@" + variable.getType().getOffset()));
+                         this.memoryRows.add(new MemoryRow(variable.getName(),"@"+variable.getType().getValue(),variable.getType().getName(),"@" + variable.getType().getOffset()));
                          this.updateDynamicMemoryRows(variable);
                      }else{
                          this.memoryRows.add(new MemoryRow(variable.getName(),variable.getType().getValue().toString(),variable.getType().getName(),"@" + variable.getType().getOffset()));
@@ -89,7 +89,6 @@ public class Interpreter {
         Comparator<MemoryRow> comparator = Comparator.comparing(MemoryRow::getOffsetInt);
         this.memoryRows.sort(comparator);
         this.dynamicMemoryRows.sort(comparator);
-       // this.dynamicController.updateList(this.dynamicMemoryRows);
 
         return this.memoryRows;
     }
@@ -104,12 +103,23 @@ public class Interpreter {
         }
 
     }
-    public void setDynamicController(StaticController dynamicController){
-        this.dynamicController =  dynamicController;
-    }
 
     public ObservableList<MemoryRow> getDynamicMemoryRows(){
         return this.dynamicMemoryRows;
     }
 
+    public void eraseAllData(){
+        this.memoryRows.remove(0,this.memoryRows.size());
+        this.dynamicMemoryRows.remove(0,this.dynamicMemoryRows.size());
+        this.symbolTable.deleteAllData();
+
+    }
+
+    public void restart(){
+        this.reader.restart();
+    }
+
+    public int getNumLines(){
+        return this.reader.getNumLines();
+    }
 }

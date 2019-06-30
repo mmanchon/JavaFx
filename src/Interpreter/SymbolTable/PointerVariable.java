@@ -1,4 +1,4 @@
-package SymbolTable;
+package Interpreter.SymbolTable;
 
 public class PointerVariable extends ArrayType {
 
@@ -10,6 +10,7 @@ public class PointerVariable extends ArrayType {
 
     public PointerVariable(String varName, String name, int size, Object value, int offset, int minPosition, int maxPosition, boolean hasMemory) {
         super(varName,name,size,value,offset,maxPosition,minPosition);
+        this.setValue(offset);
         this.hasMemory = hasMemory;
 
     }

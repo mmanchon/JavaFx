@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.StaticController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.Controllers.StaticController">
    <children>
       <BorderPane>
          <center>
@@ -43,27 +43,29 @@
          <bottom>
             <HBox alignment="TOP_RIGHT" prefHeight="31.0" prefWidth="1034.0" BorderPane.alignment="CENTER">
                <children>
-                  <Button mnemonicParsing="false" onAction="#nextLine" prefHeight="31.0" prefWidth="192.0" text="Next Line" textAlignment="CENTER" />
-                  <Button mnemonicParsing="false" prefHeight="31.0" prefWidth="175.0" text="Restart" />
+                  <Button mnemonicParsing="false" onAction="#nextLine" prefHeight="31.0" prefWidth="196.0" text="Next Line" textAlignment="CENTER" />
+                  <Button mnemonicParsing="false" prefHeight="31.0" prefWidth="179.0" text="Restart" onAction="#restart"/>
                </children>
             </HBox>
          </bottom>
          <top>
             <MenuBar BorderPane.alignment="CENTER">
               <menus>
-                <Menu mnemonicParsing="false" text="File">
+                <Menu  text="File">
                   <items>
-                    <MenuItem mnemonicParsing="false" text="Close" />
+                      <MenuItem text="Save" onAction="#onSave"/>
+                      <MenuItem text="Load" onAction="#onLoad"/>
+                      <MenuItem text="Close" onAction="#onClose"/>
                   </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Edit">
+                <Menu text="Edit">
                   <items>
-                    <MenuItem mnemonicParsing="false" text="Delete" />
+                    <MenuItem text="Delete" />
                   </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Help">
+                <Menu  text="Help">
                   <items>
-                    <MenuItem mnemonicParsing="false" text="About" />
+                    <MenuItem text="About" onAction="#onAbout" />
                   </items>
                 </Menu>
               </menus>
@@ -101,7 +103,7 @@
                 <RowConstraints maxHeight="449.0" minHeight="10.0" prefHeight="444.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <TextArea prefHeight="470.0" prefWidth="376.0" GridPane.rowIndex="1" />
+                  <TextArea prefHeight="470.0" prefWidth="376.0" GridPane.rowIndex="1" fx:id="textArea"  />
                   <Label alignment="CENTER" prefHeight="21.0" prefWidth="380.0" text="File" />
                </children>
             </GridPane>
