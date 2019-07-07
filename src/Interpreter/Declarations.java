@@ -3,6 +3,10 @@ package Interpreter;
 import Interpreter.FileReader.Reader;
 import Interpreter.SymbolTable.*;
 
+import Interpreter.SymbolTable.Objects.PointerVariable;
+import Interpreter.SymbolTable.Objects.Variable;
+import Interpreter.SymbolTable.Types.ArrayType;
+import Interpreter.SymbolTable.Types.ITypes;
 import Interpreter.Tokens.Token;
 import Interpreter.Tokens.Type;
 

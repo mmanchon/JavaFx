@@ -3,6 +3,12 @@ package Interpreter;
 import Interpreter.FileReader.Reader;
 import GUI.Models.MemoryRow;
 import Interpreter.SymbolTable.*;
+import Interpreter.SymbolTable.Contexts.Context;
+import Interpreter.SymbolTable.Contexts.Loop;
+import Interpreter.SymbolTable.Objects.PointerVariable;
+import Interpreter.SymbolTable.Objects.Variable;
+import Interpreter.SymbolTable.Types.ArrayType;
+import Interpreter.SymbolTable.Types.ITypes;
 import Interpreter.Tokens.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -46,6 +52,54 @@ public class Interpreter {
             token = this.reader.extractToken();
         }
 
+        if(this.token.getId() == Type.CLOSE_KEY){
+
+            if(!this.symbolTable.getNode(this.symbolTable.getActualNode()).hasContext()){
+                Context context = this.symbolTable.getNode(this.symbolTable.getActualNode()).getLastContext();
+
+                if(context.getTypeOfContext() == Type.IF ) {
+                    this.token = this.reader.extractToken();
+
+                    if(token.getId() == Type.ELSE){
+                        while(token.getId() == Type.CLOSE_KEY){
+                            token = this.reader.extractToken();
+                        }
+                    }
+
+                    this.symbolTable.getNode(this.symbolTable.getActualNode()).removeLastContext();
+                }else if(context.getTypeOfContext() == Type.ELSE){
+                    this.symbolTable.getNode(this.symbolTable.getActualNode()).removeLastContext();
+
+                }else if(context.getTypeOfContext() == Type.DO){
+
+                }else if(context.getTypeOfContext() == Type.WHILE){
+
+                }else if(context.getTypeOfContext() == Type.FOR){
+                    Loop loop = (Loop)context.getLastCondition();
+
+                    if(loop.analyseOperand()){
+                        Variable variable = loop.getIncrementVariable();
+                        ITypes iTypes = variable.getType();
+                        iTypes.setValue(String.valueOf(Integer.valueOf(iTypes.getValue().toString()) + Integer.valueOf(loop.getIncrementValue().toString())));
+                        variable.setType(iTypes);
+                        this.symbolTable.getNode(this.symbolTable.getActualNode()).addVariable(variable);
+                        this.reSetReaders(context.getReader());
+                    }else{
+                        this.symbolTable.getNode(this.symbolTable.getActualNode()).removeLastContext();
+                    }
+
+                }
+                this.token = this.reader.extractToken();
+
+                while(token.getId() == Type.LINE_BREAK){
+                    token = this.reader.extractToken();
+                }
+            }
+
+
+        }
+
+
         this.token = this.instructions.readInstruction(this.token,this.symbolTable);
         this.token = this.declarations.readDeclarations(token,symbolTable);
 
@@ -63,7 +117,7 @@ public class Interpreter {
             variable = (Variable) node.getVariablesList().values().toArray()[i];
            // if(!this.memoryRows.contains()){
 
-                 if(variable.getType() instanceof  PointerVariable){
+                 if(variable.getType() instanceof PointerVariable){
 
                      if(((PointerVariable) variable.getType()).isHasMemory()){
                          this.memoryRows.add(new MemoryRow(variable.getName(),"@"+variable.getType().getValue(),variable.getType().getName(),"@" + variable.getType().getOffset()));
@@ -121,5 +175,10 @@ public class Interpreter {
 
     public int getNumLines(){
         return this.reader.getNumLines();
+    }
+
+    private void reSetReaders(Reader reader){
+        this.reader = reader;
+        this.instructions.setReader(reader);
     }
 }

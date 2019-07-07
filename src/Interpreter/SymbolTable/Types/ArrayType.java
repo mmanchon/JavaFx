@@ -1,4 +1,6 @@
-package Interpreter.SymbolTable;
+package Interpreter.SymbolTable.Types;
+
+import Interpreter.SymbolTable.Objects.Variable;
 
 import java.util.Random;
 import java.util.Vector;

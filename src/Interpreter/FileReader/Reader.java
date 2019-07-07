@@ -7,7 +7,9 @@ import Interpreter.Tokens.Type;
 import java.io.*;
 import java.nio.charset.Charset;
 
-public class Reader {
+import static com.sun.org.apache.xalan.internal.xsltc.compiler.sym.error;
+
+public class Reader implements Cloneable {
 
     private BufferedReader bufferedReader;
     private Dictionary dictionary;
@@ -139,9 +141,20 @@ public class Reader {
                         }
                         break;
                     case RELATIONALS:
+                        token.appendCharToString((char) this.character);
+                        token.setId(Type.OPER_REL);
+
+                        this.character = (char) this.bufferedReader.read();
+
                         if (this.character == '=') {
+
                             token.appendCharToString((char) this.character);
+
+                            this.character = (char) this.bufferedReader.read();
+
+                        }else if(token.getLexema().equals("=")){
                             token.setId(Type.EQUAL);
+
                         }
 
                         this.character = this.bufferedReader.read();
@@ -149,7 +162,15 @@ public class Reader {
                         break;
                     case SPECIAL:
                         token.appendCharToString((char) this.character);
-                        this.character = this.bufferedReader.read();
+                        if(this.character == '&' || this.character == '|'){
+                            this.character = this.bufferedReader.read();
+                            if(this.character == '&' || this.character == '|'){
+                                token.appendCharToString((char) this.character);
+                                this.character = this.bufferedReader.read();
+                            }
+                        }else {
+                            this.character = this.bufferedReader.read();
+                        }
                         break;
                     case DOUBLE_COMAS:
 
@@ -214,7 +235,7 @@ public class Reader {
             return ARITHMETIC_SMPL;
         } else if (ch.matches("[*\\/]")) {
             return ARITHMETIC_CMPLX;
-        } else if (ch.matches("[\\(\\);\\[\\]:\\,}\\{\\&]")) {
+        } else if (ch.matches("[\\(\\);\\[\\]:\\,}\\{\\&\\|]")) {
             return SPECIAL;
         } else if (ch.matches("[ ]|[\0]|[\\t]|[\\n]|[\\r]")) {
             return SPACE;
@@ -252,6 +273,16 @@ public class Reader {
         return this.numLines;
     }
 
+    public Object clone()
+        
+    {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 
 }

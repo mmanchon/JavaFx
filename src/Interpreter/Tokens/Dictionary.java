@@ -40,13 +40,19 @@ public class Dictionary {
         this.dictionary.put("}",Type.CLOSE_KEY);
         this.dictionary.put(";",Type.SEMICOLON);
         this.dictionary.put(",",Type.COMMA);
+
+        //Logical operands
         this.dictionary.put("&",Type.AND);
+        this.dictionary.put("&&",Type.ARITHMETIC_AND);
+        this.dictionary.put("|", Type.OR);
+        this.dictionary.put("||", Type.ARITHMETIC_OR);
 
         //Simple instructions
         this.dictionary.put("if",Type.IF);
         this.dictionary.put("do",Type.DO);
         this.dictionary.put("while",Type.WHILE);
         this.dictionary.put("for",Type.FOR);
+        this.dictionary.put("else",Type.ELSE);
     }
 
     public Type checkKeyWord(String word){

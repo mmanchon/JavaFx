@@ -28,13 +28,20 @@ public enum Type {
     OPEN_KEY,
     CLOSE_KEY,
     COMMA,
+
+
     AND,
+    OR,
+    ARITHMETIC_AND,
+    ARITHMETIC_OR,
+    OPER_REL,
 
     //Instructions
     WHILE,
     DO,
     IF,
     FOR,
+    ELSE,
 
 
     //Arithmetic operations

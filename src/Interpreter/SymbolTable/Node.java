@@ -1,12 +1,19 @@
 package Interpreter.SymbolTable;
 
+import Interpreter.SymbolTable.Contexts.Context;
+import Interpreter.SymbolTable.Objects.Constant;
+import Interpreter.SymbolTable.Objects.Variable;
+
 import java.util.Hashtable;
+import java.util.Vector;
 
 public class Node {
 
     private Hashtable contantsList = new Hashtable();
 
     private Hashtable variablesList = new Hashtable();
+
+    private Vector contextsList = new Vector();
 
     private int offset = 0;
 
@@ -19,6 +26,8 @@ public class Node {
     public void addVariable(Variable variable){
         this.variablesList.put(variable.getName(),variable);
     }
+
+    public void addContext(Context context){this.contextsList.add(context);}
 
     public Constant getConstant(String name){
         return (Constant) this.contantsList.get(name);
@@ -38,6 +47,30 @@ public class Node {
 
     public void setOffset(int offset) {
         this.offset = offset;
+    }
+
+    public Vector getContextsList() {
+        return contextsList;
+    }
+
+    public Context getContext(int index){
+        return (Context) this.contextsList.get(index);
+    }
+
+    public void setContextsList(Vector contextsList) {
+        this.contextsList = contextsList;
+    }
+
+    public Context getLastContext(){
+        return (Context) this.contextsList.get(this.contextsList.size()-1);
+    }
+
+    public boolean hasContext(){
+        return this.contextsList.isEmpty();
+    }
+
+    public void removeLastContext(){
+        this.contextsList.remove(this.contextsList.size()-1);
     }
 
     @Override

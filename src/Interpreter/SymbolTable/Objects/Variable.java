@@ -1,4 +1,6 @@
-package Interpreter.SymbolTable;
+package Interpreter.SymbolTable.Objects;
+
+import Interpreter.SymbolTable.Types.ITypes;
 
 public class Variable {
 

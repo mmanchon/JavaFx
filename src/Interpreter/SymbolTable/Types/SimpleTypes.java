@@ -1,4 +1,4 @@
-package Interpreter.SymbolTable;
+package Interpreter.SymbolTable.Types;
 
 public class SimpleTypes extends ITypes {
 
