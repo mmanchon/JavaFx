@@ -264,7 +264,7 @@ public class Instructions {
         token = this.reader.extractToken();
         token = this.reader.extractToken();
 
-        context.setReader((Reader) this.reader.clone());
+        context.setLineNumber(this.reader.getNumLines());
 
         this.symbolTable.getNode(this.symbolTable.getActualNode()).addContext(context);
 
@@ -361,7 +361,7 @@ public class Instructions {
             token = this.reader.extractToken();
             token = this.reader.extractToken();
 
-            context.setReader((Reader) this.reader.clone());
+            context.setLineNumber(this.reader.getNumLines());
 
             this.symbolTable.getNode(this.symbolTable.getActualNode()).addContext(context);
 

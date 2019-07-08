@@ -43,6 +43,7 @@ public class Declarations {
         if(token.getId() == Type.INT) {
             while (token.getId() != Type.SEMICOLON) {
                 variable = new Variable();
+
                 token = this.reader.extractToken();
 
                 if (token.getId() == Type.ID_POINTER) {
@@ -69,6 +70,7 @@ public class Declarations {
 
                             iTypes = variable.getType();
 
+                            //TODO: Revisar que estoy haciendo aquí, ambos if son lo mismo
                             if (token.getId() == Type.INT_CNST) {
                                 iTypes.setValue(token.getLexema());
                                 variable.setType(iTypes);

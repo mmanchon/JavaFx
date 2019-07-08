@@ -11,9 +11,9 @@ import static com.sun.org.apache.xalan.internal.xsltc.compiler.sym.error;
 
 public class Reader implements Cloneable {
 
-    private BufferedReader bufferedReader;
     private Dictionary dictionary;
     private String fileName;
+    private RandomAccessFile randomAccessFile;
 
     private final char ID = 1;
     private final char ID_POINTER = 2;
@@ -34,14 +34,12 @@ public class Reader implements Cloneable {
 
     public void openNewFile(String filename){
         this.fileName = filename;
-        if(this.bufferedReader != null)this.closeFile();
+        if(this.randomAccessFile != null)this.closeFile();
+
         try {
 
-            this.bufferedReader = new BufferedReader(
-                    new InputStreamReader(new FileInputStream(filename), Charset.forName("UTF-8"))
-            );
-
-            this.character = this.bufferedReader.read();
+            this.randomAccessFile = new RandomAccessFile(fileName,"r");
+            this.character = this.randomAccessFile.read();
 
         } catch (FileNotFoundException e) {
             System.out.println("Error opening file");
@@ -62,7 +60,7 @@ public class Reader implements Cloneable {
                     case ID:
                         while (detectCase((char) this.character) == ID) {
                             token.appendCharToString((char) character);
-                            this.character = this.bufferedReader.read();
+                            this.character = this.randomAccessFile.read();
                         }
 
                         token.setId(Type.ID);
@@ -70,11 +68,11 @@ public class Reader implements Cloneable {
                         break;
                     case ID_POINTER:
                         //token.appendCharToString((char) character);
-                        this.character = this.bufferedReader.read();
+                        this.character = this.randomAccessFile.read();
 
                         while (detectCase((char) this.character) == ID) {
                             token.appendCharToString((char) character);
-                            this.character = this.bufferedReader.read();
+                            this.character = this.randomAccessFile.read();
                         }
 
                         token.setId(Type.ID_POINTER);
@@ -85,16 +83,16 @@ public class Reader implements Cloneable {
 
                         while (detectCase((char) this.character) == NUMERIC) {
                             token.appendCharToString((char) character);
-                            this.character = this.bufferedReader.read();
+                            this.character = this.randomAccessFile.read();
                         }
 
                         token.setId(Type.INT_CNST);
 
-                        //this.character = this.bufferedReader.read();
+                        //this.character = this.randomAccessFile.read();
 
                         break;
                     case SPACE:
-                        this.character = this.bufferedReader.read();
+                        this.character = this.randomAccessFile.read();
                         if(this.character == '\n'){
                             token.setId(Type.LINE_BREAK);
                             this.numLines++;
@@ -109,24 +107,24 @@ public class Reader implements Cloneable {
                         }
                         token.appendCharToString((char)this.character);
 
-                        this.character = (char) this.bufferedReader.read();
+                        this.character = (char) this.randomAccessFile.read();
 
                         break;
                     case ARITHMETIC_CMPLX:
 
-                        char aux = (char) this.bufferedReader.read();
+                        char aux = (char) this.randomAccessFile.read();
 
                         //Miramos que no sea un comentario
 
                         if (this.character == '/' && aux == '/') {
 
-                            this.character = (char) this.bufferedReader.read();
+                            this.character = (char) this.randomAccessFile.read();
 
                             while (this.character != '\n') {
-                                this.character = (char) this.bufferedReader.read();
+                                this.character = (char) this.randomAccessFile.read();
                             }
 
-                            this.character = (char) this.bufferedReader.read();
+                            this.character = (char) this.randomAccessFile.read();
 
                         } else {
 
@@ -144,58 +142,55 @@ public class Reader implements Cloneable {
                         token.appendCharToString((char) this.character);
                         token.setId(Type.OPER_REL);
 
-                        this.character = (char) this.bufferedReader.read();
+                        this.character = (char) this.randomAccessFile.read();
 
                         if (this.character == '=') {
 
                             token.appendCharToString((char) this.character);
 
-                            this.character = (char) this.bufferedReader.read();
-
-                        }else if(token.getLexema().equals("=")){
-                            token.setId(Type.EQUAL);
+                            this.character = (char) this.randomAccessFile.read();
 
                         }
 
-                        this.character = this.bufferedReader.read();
+                        //this.character = this.randomAccessFile.read();
 
                         break;
                     case SPECIAL:
                         token.appendCharToString((char) this.character);
                         if(this.character == '&' || this.character == '|'){
-                            this.character = this.bufferedReader.read();
+                            this.character = this.randomAccessFile.read();
                             if(this.character == '&' || this.character == '|'){
                                 token.appendCharToString((char) this.character);
-                                this.character = this.bufferedReader.read();
+                                this.character = this.randomAccessFile.read();
                             }
                         }else {
-                            this.character = this.bufferedReader.read();
+                            this.character = this.randomAccessFile.read();
                         }
                         break;
                     case DOUBLE_COMAS:
 
                         token.setId(Type.STRING);
 
-                        this.character = (char) this.bufferedReader.read();
+                        this.character = (char) this.randomAccessFile.read();
 
                         while (detectCase((char)this.character) != DOUBLE_COMAS) {
                             token.appendCharToString((char)this.character);
-                            this.character = (char) this.bufferedReader.read();
+                            this.character = (char) this.randomAccessFile.read();
 
                         }
 
-                        this.character = (char) this.bufferedReader.read();
+                        this.character = (char) this.randomAccessFile.read();
 
                         break;
                     //case DOUBLE_COMAS:
-                    //      this.character = this.bufferedReader.read();
+                    //      this.character = this.randomAccessFile.read();
                     //break;
                     default:
                         while (this.detectCase((char) this.character) != SPACE && this.detectCase((char) this.character) != ERROR) {
                             token.appendCharToString((char) character);
-                            this.character = this.bufferedReader.read();
+                            this.character = this.randomAccessFile.read();
                         }
-                        this.character = this.bufferedReader.read();
+                        this.character = this.randomAccessFile.read();
                         token.setId(Type.NULL);
                         if (this.character == -1) token.setId(Type.EOF);
                         break;
@@ -214,7 +209,7 @@ public class Reader implements Cloneable {
 
     public void closeFile(){
         try {
-            this.bufferedReader.close();
+            this.randomAccessFile.close();
         } catch (IOException e) {
             System.out.println("Error en cerrar el fichero" + e.getMessage());
             e.printStackTrace();
@@ -262,7 +257,7 @@ public class Reader implements Cloneable {
     }
 
     public void restart(){
-        if(bufferedReader != null){
+        if(this.randomAccessFile != null){
             this.closeFile();
             this.openNewFile(this.fileName);
             this.numLines = 0;
@@ -282,6 +277,19 @@ public class Reader implements Cloneable {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void goToLine(int line){
+        try {
+            this.randomAccessFile.seek(0);
+            for(int i = 0; i < line; i++){
+                this.randomAccessFile.readLine();
+            }
+            this.numLines = line;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 

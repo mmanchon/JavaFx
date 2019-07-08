@@ -5,10 +5,7 @@ import GUI.Models.MemoryRow;
 import GUI.Models.TextFile;
 import Interpreter.Interpreter;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 
 import javax.xml.soap.Text;
@@ -40,6 +37,8 @@ public class StaticController {
     public TableView dynamicTableView;
     @FXML
     public TableView tableView;
+    @FXML
+    public Label numLines;
 
     private Interpreter interpreter;
     private Editor editor;
@@ -49,7 +48,8 @@ public class StaticController {
      * The constructor.
      * The constructor is called before the initialize() method.
      */
-    public StaticController() {}
+    public StaticController() {
+    }
 
     @FXML
     void initialize(){
@@ -62,6 +62,8 @@ public class StaticController {
         dynamicValue.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
         dynamicSize.setCellValueFactory(cellData -> cellData.getValue().sizeProperty());
         dynamicOffset.setCellValueFactory(cellData -> cellData.getValue().offsetProperty());
+        textArea.setStyle("-fx-highlight-fill: lightgray; -fx-highlight-text-fill: firebrick; -fx-font-size: 12px;");
+
     }
 
     public void setInterpreter(Interpreter interpreter){
@@ -83,11 +85,17 @@ public class StaticController {
         dynamicTableView.setItems(interpreter.getDynamicMemoryRows());
         dynamicTableView.refresh();
 
-        for(int i = 0; i < this.interpreter.getNumLines()-1; i++){
-            this.from += Arrays.asList(textArea.getText().split("\n")).get(i).length();
-        }
-        int to = Arrays.asList(textArea.getText().split("\n")).get(this.interpreter.getNumLines()).length();
+    //    if(this.from == 0) {
+        this.from = 0;
+            for (int i = 0; i < this.interpreter.getNumLines() - 1; i++) {
+                this.from += Arrays.asList(textArea.getText().split("\n")).get(i).length()+1;
+            }
+      //  }
+        int to = Arrays.asList(textArea.getText().split("\n")).get(this.interpreter.getNumLines()-1).length()+1;
         this.textArea.selectRange(from, from+to);
+
+        from = from+to;
+        this.numLines.setText("Line: "+this.interpreter.getNumLines());
     }
 
     @FXML
@@ -117,10 +125,10 @@ public class StaticController {
             }
         }
 
-        this.from = 0;
-        for(int i = 0; i < this.interpreter.getNumLines(); i++){
-            this.from += Arrays.asList(textArea.getText().split("\n")).get(i).length();
-        }
+       this.from = 0;
+    //    for(int i = 0; i < this.interpreter.getNumLines(); i++){
+    //        this.from += Arrays.asList(textArea.getText().split("\n")).get(i).length();
+     //   }
     }
 
     @FXML

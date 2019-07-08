@@ -11,14 +11,14 @@ public class Context {
 
     private Vector logicOperands = new Vector();
 
-    private Reader reader;
+    private int lineNumber;
 
     private Type typeOfContext;
 
     public Context(){}
 
-    public Context(Reader reader, Type typeOfContext){
-        this.reader = reader;
+    public Context(int lineNumber, Type typeOfContext){
+        this.lineNumber = lineNumber;
         this.typeOfContext = typeOfContext;
     }
 
@@ -54,12 +54,12 @@ public class Context {
         this.logicOperands.add(type);
     }
 
-    public Reader getReader() {
-        return reader;
+    public int getLineNumber() {
+        return lineNumber;
     }
 
-    public void setReader(Reader reader) {
-        this.reader = reader;
+    public void setLineNumber(int lineNumber) {
+        this.lineNumber = lineNumber;
     }
 
     public Type getTypeOfContext() {

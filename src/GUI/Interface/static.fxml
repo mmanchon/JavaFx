@@ -43,19 +43,20 @@
          <bottom>
             <HBox alignment="TOP_RIGHT" prefHeight="31.0" prefWidth="1034.0" BorderPane.alignment="CENTER">
                <children>
+                  <Label prefHeight="37.0" prefWidth="103.0" text="Line: 0" fx:id="numLines"/>
                   <Button mnemonicParsing="false" onAction="#nextLine" prefHeight="31.0" prefWidth="196.0" text="Next Line" textAlignment="CENTER" />
-                  <Button mnemonicParsing="false" prefHeight="31.0" prefWidth="179.0" text="Restart" onAction="#restart"/>
+                  <Button mnemonicParsing="false" onAction="#restart" prefHeight="31.0" prefWidth="179.0" text="Restart" />
                </children>
             </HBox>
          </bottom>
          <top>
             <MenuBar BorderPane.alignment="CENTER">
               <menus>
-                <Menu  text="File">
+                <Menu text="File">
                   <items>
-                      <MenuItem text="Save" onAction="#onSave"/>
-                      <MenuItem text="Load" onAction="#onLoad"/>
-                      <MenuItem text="Close" onAction="#onClose"/>
+                      <MenuItem onAction="#onSave" text="Save" />
+                      <MenuItem onAction="#onLoad" text="Load" />
+                      <MenuItem onAction="#onClose" text="Close" />
                   </items>
                 </Menu>
                 <Menu text="Edit">
@@ -63,9 +64,9 @@
                     <MenuItem text="Delete" />
                   </items>
                 </Menu>
-                <Menu  text="Help">
+                <Menu text="Help">
                   <items>
-                    <MenuItem text="About" onAction="#onAbout" />
+                    <MenuItem onAction="#onAbout" text="About" />
                   </items>
                 </Menu>
               </menus>
@@ -103,7 +104,7 @@
                 <RowConstraints maxHeight="449.0" minHeight="10.0" prefHeight="444.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <TextArea prefHeight="470.0" prefWidth="376.0" GridPane.rowIndex="1" fx:id="textArea"  />
+                  <TextArea fx:id="textArea" prefHeight="470.0" prefWidth="376.0" GridPane.rowIndex="1" />
                   <Label alignment="CENTER" prefHeight="21.0" prefWidth="380.0" text="File" />
                </children>
             </GridPane>

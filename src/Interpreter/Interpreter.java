@@ -77,13 +77,14 @@ public class Interpreter {
                 }else if(context.getTypeOfContext() == Type.FOR){
                     Loop loop = (Loop)context.getLastCondition();
 
+                    Variable variable = loop.getIncrementVariable();
+                    ITypes iTypes = variable.getType();
+                    iTypes.setValue(String.valueOf(Integer.valueOf(iTypes.getValue().toString()) + Integer.valueOf(loop.getIncrementValue().toString())));
+                    variable.setType(iTypes);
+                    this.symbolTable.getNode(this.symbolTable.getActualNode()).addVariable(variable);
+
                     if(loop.analyseOperand()){
-                        Variable variable = loop.getIncrementVariable();
-                        ITypes iTypes = variable.getType();
-                        iTypes.setValue(String.valueOf(Integer.valueOf(iTypes.getValue().toString()) + Integer.valueOf(loop.getIncrementValue().toString())));
-                        variable.setType(iTypes);
-                        this.symbolTable.getNode(this.symbolTable.getActualNode()).addVariable(variable);
-                        this.reSetReaders(context.getReader());
+                        this.reader.goToLine(context.getLineNumber());
                     }else{
                         this.symbolTable.getNode(this.symbolTable.getActualNode()).removeLastContext();
                     }
