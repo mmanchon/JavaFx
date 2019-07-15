@@ -58,7 +58,7 @@ public class Reader implements Cloneable {
 
                 switch (detectCase((char) this.character)) {
                     case ID:
-                        while (detectCase((char) this.character) == ID) {
+                        while (detectCase((char) this.character) == ID || detectCase((char) this.character) == NUMERIC) {
                             token.appendCharToString((char) character);
                             this.character = this.randomAccessFile.read();
                         }

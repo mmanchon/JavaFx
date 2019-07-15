@@ -57,6 +57,8 @@ public enum Type {
 
     //Extras
     LINE_BREAK,
+    MAIN,
+    VOID,
     NULL,
     EOF
 }

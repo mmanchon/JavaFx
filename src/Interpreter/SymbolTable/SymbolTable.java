@@ -10,6 +10,7 @@ public class SymbolTable {
 
     private Vector nodeList;
 
+
     public SymbolTable(){
         this.actualNode = 0;
         this.staticOffset = -4;
@@ -17,7 +18,7 @@ public class SymbolTable {
         this.nodeList = new Vector();
     }
 
-    public void addNode(Node node){ this.nodeList.add(node);}
+    public void addNode(Node node){ this.nodeList.add(this.actualNode,node);}
 
     public Node getNode(int node){return (Node) this.nodeList.get(node);}
 
@@ -53,7 +54,6 @@ public class SymbolTable {
         this.nodeList = nodeList;
     }
 
-
     public void removeNode(int index){
         this.nodeList.remove(this.getNode(index));
     }
@@ -75,5 +75,6 @@ public class SymbolTable {
             ((Node)this.nodeList.get(i)).deleteAllData();
         }
         this.actualNode = 0;
+
     }
 }

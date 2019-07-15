@@ -53,6 +53,10 @@ public class Dictionary {
         this.dictionary.put("while",Type.WHILE);
         this.dictionary.put("for",Type.FOR);
         this.dictionary.put("else",Type.ELSE);
+
+        //Extras
+        this.dictionary.put("main",Type.MAIN);
+        this.dictionary.put("void",Type.VOID);
     }
 
     public Type checkKeyWord(String word){

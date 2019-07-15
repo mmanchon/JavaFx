@@ -41,7 +41,9 @@ public class Interpreter {
 
     public void setNewFile(File file){
         this.reader.openNewFile(file.getAbsolutePath());
+        token = this.headers.readFunctionsHeaders(token,symbolTable);
         token = this.headers.readMainHeader(token,symbolTable);
+        System.out.println(this.symbolTable.toString());
 
     }
 

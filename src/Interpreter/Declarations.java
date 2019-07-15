@@ -70,7 +70,7 @@ public class Declarations {
 
                             iTypes = variable.getType();
 
-                            //TODO: Revisar que estoy haciendo aquí, ambos if son lo mismo
+                            //TODO: Revisar que estoy haciendo aquí, ambos if son lo mismo y que pasa si es ID
                             if (token.getId() == Type.INT_CNST) {
                                 iTypes.setValue(token.getLexema());
                                 variable.setType(iTypes);

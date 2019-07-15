@@ -13,9 +13,13 @@ public class Node {
 
     private Hashtable variablesList = new Hashtable();
 
+    private Hashtable argumentList = new Hashtable();
+
     private Vector contextsList = new Vector();
 
-    private int offset = 0;
+    private String nodeName;
+
+    private int nodeLine;
 
     public Node(){}
 
@@ -25,6 +29,10 @@ public class Node {
 
     public void addVariable(Variable variable){
         this.variablesList.put(variable.getName(),variable);
+    }
+
+    public void addArgument(Variable variable){
+        this.argumentList.put(variable.getName(),variable);
     }
 
     public void addContext(Context context){this.contextsList.add(context);}
@@ -37,16 +45,28 @@ public class Node {
         return (Variable) this.variablesList.get(name);
     }
 
+    public Variable getArgument(String name){
+        return (Variable) this.argumentList.get(name);
+    }
+
     public Hashtable getVariablesList(){
         return this.variablesList;
     }
 
-    public int getOffset() {
-        return offset;
+    public int getNodeLine() {
+        return nodeLine;
     }
 
-    public void setOffset(int offset) {
-        this.offset = offset;
+    public void setNodeLine(int nodeLine) {
+        this.nodeLine = nodeLine;
+    }
+
+    public String getNodeName() {
+        return nodeName;
+    }
+
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName;
     }
 
     public Vector getContextsList() {
@@ -77,6 +97,7 @@ public class Node {
     public String toString(){
         String result = "\t\t<Bloc>\n";
 
+        result += "\t\t\t<Name= >"+this.nodeName+"\n";
         result += "\t\t\t<Constants>\n";
         for (int i=0; i<this.contantsList.size(); i++)
             result += ((Constant)this.contantsList.values().toArray()[i]).toString();
@@ -87,6 +108,11 @@ public class Node {
             result += (this.variablesList.values().toArray()[i]).toString();
         result += "\t\t\t</Variables>\n";
 
+        result += "\t\t\t<Arguments>\n";
+        for (int i=0; i<this.argumentList.size(); i++)
+            result += (this.argumentList.values().toArray()[i]).toString();
+        result += "\t\t\t</Arguments>\n";
+
         result += "\t\t</Bloc>\n";
         return result;
     }
@@ -94,6 +120,6 @@ public class Node {
     public void deleteAllData(){
         this.contantsList.clear();
         this.variablesList.clear();
-        this.offset = 0;
+        this.argumentList.clear();
     }
 }
