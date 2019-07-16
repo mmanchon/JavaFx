@@ -57,6 +57,7 @@ public class Dictionary {
         //Extras
         this.dictionary.put("main",Type.MAIN);
         this.dictionary.put("void",Type.VOID);
+        this.dictionary.put("return",Type.RETURN);
     }
 
     public Type checkKeyWord(String word){

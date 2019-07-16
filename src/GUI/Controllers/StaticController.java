@@ -75,7 +75,6 @@ public class StaticController {
     @FXML
     public void nextLine(){
 
-        this.interpreter.analiseNextLine();
 
         tableView.getItems().remove(0,tableView.getItems().size());
 
@@ -96,6 +95,8 @@ public class StaticController {
 
         from = from+to;
         this.numLines.setText("Line: "+this.interpreter.getNumLines());
+        this.interpreter.analiseNextLine();
+
     }
 
     @FXML

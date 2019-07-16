@@ -24,15 +24,21 @@ public class Headers {
 
     public Token readFunctionsHeaders(Token token, SymbolTable symbolTable){
         this.symbolTable = symbolTable;
+        Node node = new Node();
 
         while(token.getId() != Type.INT && token.getId() != Type.VOID){
             token = this.reader.extractToken();
         }
 
+        if(token.getId() == Type.INT){
+            node.setReturnType(Type.INT);
+        }else{
+            node.setReturnType(Type.VOID);
+        }
         token = this.reader.extractToken();
 
         if(token.getId() != Type.MAIN){
-            token = this.extractFunction(token);
+            token = this.extractFunction(token, node);
         }
 
         return token;
@@ -54,7 +60,7 @@ public class Headers {
 
         this.symbolTable.setActualNode(0);
         this.symbolTable.getNode(this.symbolTable.getActualNode()).setNodeName("main");
-
+        //this.symbolTable.getNode(this.symbolTable.getActualNode()).
         return token;
     }
 
@@ -62,12 +68,10 @@ public class Headers {
         return this.numLine;
     }
 
-    public Token extractFunction(Token token){
+    public Token extractFunction(Token token, Node node){
 
-        Node node = new Node();
         Variable variable;
         Token aux;
-        Random random = new Random();
 
         node.setNodeName(token.getLexema()); // nuevo nodo donde guardamos la funcion
 

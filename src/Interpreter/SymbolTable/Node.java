@@ -3,7 +3,9 @@ package Interpreter.SymbolTable;
 import Interpreter.SymbolTable.Contexts.Context;
 import Interpreter.SymbolTable.Objects.Constant;
 import Interpreter.SymbolTable.Objects.Variable;
+import Interpreter.Tokens.Type;
 
+import javax.xml.bind.TypeConstraintException;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -21,7 +23,17 @@ public class Node {
 
     private int nodeLine;
 
-    public Node(){}
+    private Type returnType;
+
+    private Object returnValue;
+
+    private int returnLine;
+
+    private int returnNode;
+
+    public Node(){
+        this.returnValue = null;
+    }
 
     public void addConstant(Constant constant){
         this.contantsList.put(constant.getName(),constant);
@@ -73,6 +85,38 @@ public class Node {
         return contextsList;
     }
 
+    public Type getReturnType() {
+        return returnType;
+    }
+
+    public void setReturnType(Type returnType) {
+        this.returnType = returnType;
+    }
+
+    public int getReturnLine() {
+        return returnLine;
+    }
+
+    public void setReturnLine(int returnLine) {
+        this.returnLine = returnLine;
+    }
+
+    public int getReturnNode() {
+        return returnNode;
+    }
+
+    public void setReturnNode(int returnNode) {
+        this.returnNode = returnNode;
+    }
+
+    public Object getReturnValue() {
+        return returnValue;
+    }
+
+    public void setReturnValue(Object returnValue) {
+        this.returnValue = returnValue;
+    }
+
     public Context getContext(int index){
         return (Context) this.contextsList.get(index);
     }
@@ -93,11 +137,13 @@ public class Node {
         this.contextsList.remove(this.contextsList.size()-1);
     }
 
+
+
     @Override
     public String toString(){
         String result = "\t\t<Bloc>\n";
 
-        result += "\t\t\t<Name= >"+this.nodeName+"\n";
+        result += "\t\t\t<Name= "+this.nodeName+" Line="+this.nodeLine+">\n";
         result += "\t\t\t<Constants>\n";
         for (int i=0; i<this.contantsList.size(); i++)
             result += ((Constant)this.contantsList.values().toArray()[i]).toString();

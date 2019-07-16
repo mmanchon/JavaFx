@@ -59,6 +59,7 @@ public enum Type {
     LINE_BREAK,
     MAIN,
     VOID,
+    RETURN,
     NULL,
     EOF
 }

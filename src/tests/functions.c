@@ -1,9 +1,11 @@
-int function1(){
-
+int function1 (){
+	int a;
+    return 2;
 }
 
 void function2(){
-
+    int b = 0;
+    b++;
 }
 
 int main(){

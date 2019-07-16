@@ -18,7 +18,13 @@ public class SymbolTable {
         this.nodeList = new Vector();
     }
 
-    public void addNode(Node node){ this.nodeList.add(this.actualNode,node);}
+    public void addNode(Node node){
+        if(this.nodeList.contains(node)) {
+            this.nodeList.set(this.actualNode, node);
+        }else{
+            this.nodeList.add(this.actualNode, node);
+        }
+    }
 
     public Node getNode(int node){return (Node) this.nodeList.get(node);}
 
@@ -56,6 +62,27 @@ public class SymbolTable {
 
     public void removeNode(int index){
         this.nodeList.remove(this.getNode(index));
+    }
+
+    public int isFunction(String function){
+        Node node;
+
+        for(int i = 0; i < this.nodeList.size();i++){
+            node = (Node)this.nodeList.get(i);
+            if(node.getNodeName().equals(function)) return i;
+        }
+
+        return 0;
+    }
+
+    public Node getFunction(String function){
+        Node node;
+        for(int i = 0; i < this.nodeList.size();i++){
+            node = (Node)this.nodeList.get(i);
+            if(node.getNodeName().equals(function)) return node;
+        }
+
+        return null;
     }
 
     @Override

@@ -268,6 +268,10 @@ public class Reader implements Cloneable {
         return this.numLines;
     }
 
+    public void setNumLines(int numLines){
+        this.numLines = numLines;
+    }
+
     public Object clone()
         
     {

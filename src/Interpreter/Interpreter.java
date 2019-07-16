@@ -43,7 +43,6 @@ public class Interpreter {
         this.reader.openNewFile(file.getAbsolutePath());
         token = this.headers.readFunctionsHeaders(token,symbolTable);
         token = this.headers.readMainHeader(token,symbolTable);
-        System.out.println(this.symbolTable.toString());
 
     }
 
@@ -97,50 +96,57 @@ public class Interpreter {
                 while(token.getId() == Type.LINE_BREAK){
                     token = this.reader.extractToken();
                 }
+            }else if(this.symbolTable.getActualNode() > 0){
+                
+                this.reader.goToLine(this.symbolTable.getNode(this.symbolTable.getActualNode()).getReturnLine());
+                this.symbolTable.getNode(this.symbolTable.getActualNode()).deleteAllData();
+                this.symbolTable.setActualNode(this.symbolTable.getNode(this.symbolTable.getActualNode()).getReturnNode());
             }
 
 
         }
 
-
-        this.token = this.instructions.readInstruction(this.token,this.symbolTable);
         this.token = this.declarations.readDeclarations(token,symbolTable);
+        this.token = this.instructions.readInstruction(this.token,this.symbolTable);
 
 
     }
 
     public  ObservableList<MemoryRow> convertToMemoryData(){
-        Node node = this.symbolTable.getNode(this.symbolTable.getActualNode());
         Variable variable;
 
         this.memoryRows.removeAll();
         this.dynamicMemoryRows.remove(0,this.dynamicMemoryRows.size());
 
-        for(int i = 0; i < node.getVariablesList().size(); i++){
-            variable = (Variable) node.getVariablesList().values().toArray()[i];
-           // if(!this.memoryRows.contains()){
+        for(int j = 0; j < this.symbolTable.getNodeList().size(); j++) {
+            Node node = this.symbolTable.getNode(j);
 
-                 if(variable.getType() instanceof PointerVariable){
+            for (int i = 0; i < node.getVariablesList().size(); i++) {
+                variable = (Variable) node.getVariablesList().values().toArray()[i];
+                // if(!this.memoryRows.contains()){
 
-                     if(((PointerVariable) variable.getType()).isHasMemory()){
-                         this.memoryRows.add(new MemoryRow(variable.getName(),"@"+variable.getType().getValue(),variable.getType().getName(),"@" + variable.getType().getOffset()));
-                         this.updateDynamicMemoryRows(variable);
-                     }else{
-                         this.memoryRows.add(new MemoryRow(variable.getName(),variable.getType().getValue().toString(),variable.getType().getName(),"@" + variable.getType().getOffset()));
-                     }
+                if (variable.getType() instanceof PointerVariable) {
 
-                }else if((variable.getType() instanceof ArrayType)){
+                    if (((PointerVariable) variable.getType()).isHasMemory()) {
+                        this.memoryRows.add(new MemoryRow(variable.getName(), "@" + variable.getType().getValue(), variable.getType().getName(), "@" + variable.getType().getOffset()));
+                        this.updateDynamicMemoryRows(variable);
+                    } else {
+                        this.memoryRows.add(new MemoryRow(variable.getName(), variable.getType().getValue().toString(), variable.getType().getName(), "@" + variable.getType().getOffset()));
+                    }
+
+                } else if ((variable.getType() instanceof ArrayType)) {
 
                     Variable variableArray;
-                     for(int j = 0; j < ((ArrayType)variable.getType()).getMaxPosition(); j++){
-                         variableArray = ((ArrayType)variable.getType()).getElement(j);
-                         this.memoryRows.add(new MemoryRow(variableArray.getName(),(variableArray.getType().getValue()).toString(),variableArray.getType().getName(),"@" + variableArray.getType().getOffset()));
-                     }
+                    for (int k = 0; j < ((ArrayType) variable.getType()).getMaxPosition(); k++) {
+                        variableArray = ((ArrayType) variable.getType()).getElement(k);
+                        this.memoryRows.add(new MemoryRow(variableArray.getName(), (variableArray.getType().getValue()).toString(), variableArray.getType().getName(), "@" + variableArray.getType().getOffset()));
+                    }
 
-                 }else{
-                    this.memoryRows.add(new MemoryRow(variable.getName(),variable.getType().getValue().toString(),variable.getType().getName(),"@" + variable.getType().getOffset()));
+                } else {
+                    this.memoryRows.add(new MemoryRow(variable.getName(), variable.getType().getValue().toString(), variable.getType().getName(), "@" + variable.getType().getOffset()));
                 }
-         //   }
+                //   }
+            }
         }
 
         Comparator<MemoryRow> comparator = Comparator.comparing(MemoryRow::getOffsetInt);
@@ -180,8 +186,5 @@ public class Interpreter {
         return this.reader.getNumLines();
     }
 
-    private void reSetReaders(Reader reader){
-        this.reader = reader;
-        this.instructions.setReader(reader);
-    }
+
 }
