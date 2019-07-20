@@ -47,6 +47,10 @@ public class Node {
         this.argumentList.put(variable.getName(),variable);
     }
 
+    public Hashtable getArgumentList() {
+        return argumentList;
+    }
+
     public void addContext(Context context){this.contextsList.add(context);}
 
     public Constant getConstant(String name){

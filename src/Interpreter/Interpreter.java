@@ -43,7 +43,7 @@ public class Interpreter {
         this.reader.openNewFile(file.getAbsolutePath());
         token = this.headers.readFunctionsHeaders(token,symbolTable);
         token = this.headers.readMainHeader(token,symbolTable);
-
+        System.out.println(this.symbolTable.toString());
     }
 
 
@@ -97,7 +97,7 @@ public class Interpreter {
                     token = this.reader.extractToken();
                 }
             }else if(this.symbolTable.getActualNode() > 0){
-                
+
                 this.reader.goToLine(this.symbolTable.getNode(this.symbolTable.getActualNode()).getReturnLine());
                 this.symbolTable.getNode(this.symbolTable.getActualNode()).deleteAllData();
                 this.symbolTable.setActualNode(this.symbolTable.getNode(this.symbolTable.getActualNode()).getReturnNode());
@@ -117,9 +117,17 @@ public class Interpreter {
 
         this.memoryRows.removeAll();
         this.dynamicMemoryRows.remove(0,this.dynamicMemoryRows.size());
+        this.memoryRows.remove(0,this.memoryRows.size());
 
         for(int j = 0; j < this.symbolTable.getNodeList().size(); j++) {
             Node node = this.symbolTable.getNode(j);
+
+            if( this.symbolTable.getActualNode() == j && j > 0){
+                for(int i = 0; i < node.getArgumentList().size(); i++) {
+                    variable = (Variable) node.getArgumentList().values().toArray()[i];
+                    this.memoryRows.add(new MemoryRow(variable.getName(), variable.getType().getValue().toString(), variable.getType().getName(), "@" + variable.getType().getOffset()));
+                }
+            }
 
             for (int i = 0; i < node.getVariablesList().size(); i++) {
                 variable = (Variable) node.getVariablesList().values().toArray()[i];
@@ -145,7 +153,7 @@ public class Interpreter {
                 } else {
                     this.memoryRows.add(new MemoryRow(variable.getName(), variable.getType().getValue().toString(), variable.getType().getName(), "@" + variable.getType().getOffset()));
                 }
-                //   }
+
             }
         }
 

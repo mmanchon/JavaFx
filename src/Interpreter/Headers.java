@@ -102,11 +102,11 @@ public class Headers {
                     //close bra
                     token = this.reader.extractToken();
                 }else if(aux.getId() == Type.ID_POINTER) {
-
+                    variable.setName(aux.getLexema());
                     variable.setType(this.createIntArgument(token.getLexema(), "int_pointer", this.symbolTable.getStaticOffset() + 4, 4, 0, 0));
 
                 } else if(aux.getId() == Type.ID){
-
+                    variable.setName(aux.getLexema());
                     variable.setType(this.createIntArgument(token.getLexema(), "int", this.symbolTable.getStaticOffset() + 4, 4, 0, 0));
 
                 }
@@ -114,7 +114,7 @@ public class Headers {
                node.addArgument(variable);
             }
 
-            token = this.reader.extractToken();
+            if(token.getId() != Type.CLOSE_PAR) token = this.reader.extractToken();
         }
 
         token = this.reader.extractToken();

@@ -84,12 +84,11 @@ public class StaticController {
         dynamicTableView.setItems(interpreter.getDynamicMemoryRows());
         dynamicTableView.refresh();
 
-    //    if(this.from == 0) {
         this.from = 0;
-            for (int i = 0; i < this.interpreter.getNumLines() - 1; i++) {
-                this.from += Arrays.asList(textArea.getText().split("\n")).get(i).length()+1;
-            }
-      //  }
+        for (int i = 0; i < this.interpreter.getNumLines() - 1; i++) {
+            this.from += Arrays.asList(textArea.getText().split("\n")).get(i).length()+1;
+        }
+
         int to = Arrays.asList(textArea.getText().split("\n")).get(this.interpreter.getNumLines()-1).length()+1;
         this.textArea.selectRange(from, from+to);
 
