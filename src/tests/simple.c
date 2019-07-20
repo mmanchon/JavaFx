@@ -5,7 +5,7 @@ int main(){
     int *c = NULL;
     int x = 3, y =0, z;
     int *d;
-
+    b[3] = 0;
     z = 3;
 
     c = malloc (sizeof(int) * 3);

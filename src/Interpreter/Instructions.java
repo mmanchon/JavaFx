@@ -1,5 +1,7 @@
 package Interpreter;
 
+import Interpreter.Errors.ArrayErrors.AccessError;
+import Interpreter.Errors.BasicError;
 import Interpreter.FileReader.Reader;
 import Interpreter.SymbolTable.*;
 import Interpreter.SymbolTable.Contexts.Condition;
@@ -24,7 +26,7 @@ public class Instructions {
         this.symbolTable = symbolTable;
     }
 
-    public Token readInstruction(Token token, SymbolTable symbolTable) {
+    public Token readInstruction(Token token, SymbolTable symbolTable) throws BasicError {
         this.symbolTable = symbolTable;
 
         if (token.getId() == Type.ID) {
@@ -116,7 +118,7 @@ public class Instructions {
         return token;
     }
 
-    private Token variable(Token token) {
+    private Token variable(Token token) throws BasicError {
         Variable variable;
         Token aux = token;
 
@@ -239,7 +241,7 @@ public class Instructions {
         return token;
     }
 
-    private Token arrayAssignment(Variable variable) {
+    private Token arrayAssignment(Variable variable) throws BasicError{
         ArrayType arrayType;
 
         Token token = this.reader.extractToken();
@@ -257,6 +259,11 @@ public class Instructions {
         token = this.reader.extractToken();
 
         arrayType = (ArrayType) variable.getType();
+
+        if(index > arrayType.getMaxPosition()){
+            throw new AccessError("Error en acceder al array",null,index,arrayType.getMinPosition(),arrayType.getMaxPosition());
+        }
+
 
         if (token.getId() == Type.INT_CNST) {
             arrayType.setElement(index, token.getLexema());

@@ -22,7 +22,7 @@ public class Dictionary {
         this.dictionary.put("double",Type.DOUBLE);
         this.dictionary.put("long",Type.LONG);
 
-        //DynamicController memory
+        //Dynamic memory
         this.dictionary.put("malloc",Type.MALLOC);
         this.dictionary.put("free",Type.FREE);
         this.dictionary.put("calloc",Type.CALLOC);

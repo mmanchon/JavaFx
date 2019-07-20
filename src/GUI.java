@@ -76,7 +76,6 @@ public class GUI extends Application {
 
         GridPane dynamicPane = (GridPane) loader.load();
 
-        DynamicController controller = (DynamicController) loader.getController();
       //  this.interpreter.setDynamicController(controller);
         // Show the scene containing the root layout.
         Scene scene = new Scene(dynamicPane, 400, 800);
