@@ -42,6 +42,8 @@ public enum Type {
     IF,
     FOR,
     ELSE,
+    PRINT,
+    SCAN,
 
 
     //Arithmetic operations

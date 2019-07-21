@@ -20,10 +20,12 @@ public class Instructions {
 
     private Reader reader;
     private SymbolTable symbolTable;
+    private String text;
 
     public Instructions(Reader reader, SymbolTable symbolTable) {
         this.reader = reader;
         this.symbolTable = symbolTable;
+        this.text = "";
     }
 
     public Token readInstruction(Token token, SymbolTable symbolTable) throws BasicError {
@@ -87,6 +89,38 @@ public class Instructions {
 
             token = this.reader.extractToken();
             token = this.reader.extractToken();
+
+        }else if(token.getId() == Type.PRINT){
+             token = this.reader.extractToken();
+             token = this.reader.extractToken();
+
+             this.text = "";
+
+             while(token.getId() != Type.CLOSE_PAR) {
+                 if (token.getId() == Type.STRING) {
+                    this.text = this.text + token.getLexema();
+                 } else if(token.getId() == Type.ID || token.getId() == Type.ID_POINTER){
+                     Variable variable = this.symbolTable.getNode(this.symbolTable.getActualNode()).getVariable(token.getLexema());
+                     this.text = this.text + variable.getType().getValue().toString();
+                 }
+                 token = this.reader.extractToken();
+             }
+
+             token = this.reader.extractToken();
+             token = this.reader.extractToken();
+
+        }else if(token.getId() == Type.SCAN){
+            token = this.reader.extractToken();
+            token = this.reader.extractToken();
+            //TODO: Detect if variable exists
+
+            Variable variable = this.symbolTable.getNode(this.symbolTable.getActualNode()).getVariable(token.getLexema());
+
+            token = this.reader.extractToken();
+            token = this.reader.extractToken();
+            token = this.reader.extractToken();
+
+
 
         }
 
@@ -492,5 +526,15 @@ public class Instructions {
 
 
         return token;
+    }
+
+    public String getText() {
+        String aux = text;
+        this.text = "";
+        return aux;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 }

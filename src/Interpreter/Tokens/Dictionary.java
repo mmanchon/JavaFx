@@ -53,6 +53,8 @@ public class Dictionary {
         this.dictionary.put("while",Type.WHILE);
         this.dictionary.put("for",Type.FOR);
         this.dictionary.put("else",Type.ELSE);
+        this.dictionary.put("print",Type.PRINT);
+        this.dictionary.put("scan",Type.SCAN);
 
         //Extras
         this.dictionary.put("main",Type.MAIN);

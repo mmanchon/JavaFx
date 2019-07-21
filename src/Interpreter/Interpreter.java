@@ -1,6 +1,7 @@
 package Interpreter;
 
 import GUI.Controllers.PopUpController;
+import GUI.Controllers.StaticController;
 import Interpreter.Errors.BasicError;
 import Interpreter.FileReader.Reader;
 import GUI.Models.MemoryRow;
@@ -34,8 +35,10 @@ public class Interpreter {
     private SymbolTable symbolTable = new SymbolTable();
     private ObservableList<MemoryRow> memoryRows = FXCollections.observableArrayList();
     private ObservableList<MemoryRow> dynamicMemoryRows = FXCollections.observableArrayList();
+    private StaticController controller;
 
     private Token token = new Token();
+
 
     public Interpreter() {
         this.reader = new Reader();
@@ -50,11 +53,13 @@ public class Interpreter {
         this.reader.openNewFile(file.getAbsolutePath());
         token = this.headers.readFunctionsHeaders(token, symbolTable);
         token = this.headers.readMainHeader(token, symbolTable);
-        System.out.println(this.symbolTable.toString());
+        //System.out.println(this.symbolTable.toString());
     }
 
 
     public void analiseNextLine() {
+
+        String text;
 
         while (token.getId() == Type.LINE_BREAK) {
             token = this.reader.extractToken();
@@ -117,6 +122,11 @@ public class Interpreter {
 
             this.token = this.declarations.readDeclarations(token, symbolTable);
             this.token = this.instructions.readInstruction(this.token, this.symbolTable);
+
+
+            if( !(text = this.instructions.getText()).equals("")){
+                this.controller.addTerminalText(text);
+            }
 
         } catch (BasicError basicError) {
             this.openPopUpView(basicError);
@@ -206,6 +216,13 @@ public class Interpreter {
         return this.reader.getNumLines();
     }
 
+    public StaticController getController() {
+        return controller;
+    }
+
+    public void setController(StaticController controller) {
+        this.controller = controller;
+    }
 
     private void openPopUpView(BasicError basicError){
         Parent root;

@@ -4,6 +4,8 @@ import GUI.Models.Editor;
 import GUI.Models.MemoryRow;
 import GUI.Models.TextFile;
 import Interpreter.Interpreter;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
@@ -34,6 +36,8 @@ public class StaticController {
     @FXML
     public TextArea textArea;
     @FXML
+    public TextArea terminal;
+    @FXML
     public TableView dynamicTableView;
     @FXML
     public TableView tableView;
@@ -62,7 +66,17 @@ public class StaticController {
         dynamicValue.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
         dynamicSize.setCellValueFactory(cellData -> cellData.getValue().sizeProperty());
         dynamicOffset.setCellValueFactory(cellData -> cellData.getValue().offsetProperty());
+
         textArea.setStyle("-fx-highlight-fill: lightgray; -fx-highlight-text-fill: firebrick; -fx-font-size: 12px;");
+
+        terminal.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
+                // this will run whenever text is changed
+                System.out.println("OLD VALUE: "+ oldValue);
+                System.out.println("NEW VALUE: " + newValue);
+            }
+        });
 
     }
 
@@ -152,6 +166,22 @@ public class StaticController {
         this.interpreter.eraseAllData();
         this.interpreter.restart();
         this.from = 0;
+    }
+
+    public void addTerminalText(String text){
+        for(int i = 0; i < text.length(); i++){
+            if(text.charAt(i) == '\\') {
+                i++;
+                if(text.charAt(i) == 'n'){
+                    this.terminal.appendText("\n");
+                }else{
+                    this.terminal.appendText("\\"+text.charAt(i));
+                }
+            }else{
+                this.terminal.appendText(String.valueOf(text.charAt(i)));
+            }
+        }
+
     }
 
 }
