@@ -1,10 +1,45 @@
-.root {
-    -fx-background-color: darkgrey;
-}
-.label {
-    -fx-font-size: 20;
-}
+
 
 .text-area{
-    -fx-highlight-fill: lightgray; -fx-highlight-text-fill: firebrick; -fx-font-size: 12px;
+    -fx-highlight-fill: red; -fx-highlight-text-fill: white; -fx-font-size: 12px;
+}
+
+
+
+.menu .label{
+    -fx-text-fill: #F5F5DC;
+}
+.menu-item{
+    -fx-background-color: #696969;
+    -fx-border-color: #696969;
+}
+
+.menu-bar{
+    -fx-background-color: #696969;
+}
+
+.hbox{
+    -fx-background-color: #696969;
+
+}
+
+.tableLabel{
+    -fx-background-color: #808080;
+    -fx-text-fill: #F5F5DC;
+
+}
+
+#nextLine{
+    -fx-background-image: url("icons_images/nextLine.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position:center;
+    -fx-background-color: #696969;
+
+}
+
+#restart{
+    -fx-background-image: url("icons_images/restart.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position:center;
+    -fx-background-color: #696969;
 }

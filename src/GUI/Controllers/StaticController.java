@@ -6,6 +6,8 @@ import GUI.Models.TextFile;
 import Interpreter.Interpreter;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
@@ -77,6 +79,17 @@ public class StaticController {
                 System.out.println("NEW VALUE: " + newValue);
             }
         });
+
+        textArea.setOnMouseClicked(new EventHandler<Event>()
+        {
+            @Override
+            public void handle(Event arg0)
+            {
+                System.out.println("selected text:"
+                        + textArea.getSelectedText());
+            }
+        });
+
 
     }
 
