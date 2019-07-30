@@ -42,7 +42,7 @@ public class Interpreter {
 
     public Interpreter() {
         this.reader = new Reader();
-        this.symbolTable.addNode(new Node());
+
 
         this.headers = new Headers(reader, symbolTable);
         this.declarations = new Declarations(reader, symbolTable);
@@ -69,8 +69,8 @@ public class Interpreter {
 
             if (this.token.getId() == Type.CLOSE_KEY) {
 
-                if (!this.symbolTable.getNode(this.symbolTable.getActualNode()).hasContext()) {
-                    Context context = this.symbolTable.getNode(this.symbolTable.getActualNode()).getLastContext();
+                if (!this.symbolTable.getActualNode().hasContext()) {
+                    Context context = this.symbolTable.getActualNode().getLastContext();
 
                     if (context.getTypeOfContext() == Type.IF) {
                         this.token = this.reader.extractToken();
@@ -81,9 +81,9 @@ public class Interpreter {
                             }
                         }
 
-                        this.symbolTable.getNode(this.symbolTable.getActualNode()).removeLastContext();
+                        this.symbolTable.getActualNode().removeLastContext();
                     } else if (context.getTypeOfContext() == Type.ELSE) {
-                        this.symbolTable.getNode(this.symbolTable.getActualNode()).removeLastContext();
+                        this.symbolTable.getActualNode().removeLastContext();
 
                     } else if (context.getTypeOfContext() == Type.DO) {
 
@@ -96,12 +96,12 @@ public class Interpreter {
                         ITypes iTypes = variable.getType();
                         iTypes.setValue(String.valueOf(Integer.valueOf(iTypes.getValue().toString()) + Integer.valueOf(loop.getIncrementValue().toString())));
                         variable.setType(iTypes);
-                        this.symbolTable.getNode(this.symbolTable.getActualNode()).addVariable(variable);
+                        this.symbolTable.getActualNode().addVariable(variable);
 
                         if (loop.analyseOperand()) {
                             this.reader.goToLine(context.getLineNumber());
                         } else {
-                            this.symbolTable.getNode(this.symbolTable.getActualNode()).removeLastContext();
+                            this.symbolTable.getActualNode().removeLastContext();
                         }
 
                     }
@@ -110,11 +110,12 @@ public class Interpreter {
                     while (token.getId() == Type.LINE_BREAK) {
                         token = this.reader.extractToken();
                     }
-                } else if (this.symbolTable.getActualNode() > 0) {
+                } else if (!this.symbolTable.getExecutionFunctions().isEmpty()) {
 
-                    this.reader.goToLine(this.symbolTable.getNode(this.symbolTable.getActualNode()).getReturnLine());
-                    this.symbolTable.getNode(this.symbolTable.getActualNode()).deleteAllData();
-                    this.symbolTable.setActualNode(this.symbolTable.getNode(this.symbolTable.getActualNode()).getReturnNode());
+                    this.reader.goToLine(this.symbolTable.getActualNode().getReturnLine());
+                    this.symbolTable.getActualNode().deleteAllData();
+                    this.symbolTable.removeExecutionFunction();
+
                 }
 
 
@@ -124,7 +125,7 @@ public class Interpreter {
             this.token = this.instructions.readInstruction(this.token, this.symbolTable);
 
 
-            if( !(text = this.instructions.getText()).equals("")){
+            if (!(text = this.instructions.getText()).equals("")) {
                 this.controller.addTerminalText(text);
             }
 
@@ -141,40 +142,27 @@ public class Interpreter {
         this.dynamicMemoryRows.remove(0, this.dynamicMemoryRows.size());
         this.memoryRows.remove(0, this.memoryRows.size());
 
-        for (int j = 0; j < this.symbolTable.getNodeList().size(); j++) {
-            Node node = this.symbolTable.getNode(j);
+        for (int i = 0; i < this.symbolTable.getMain().getVariablesList().size(); i++) {
+            variable = (Variable) this.symbolTable.getMain().getVariablesList().values().toArray()[i];
+            System.out.println(this.symbolTable.toString());
+            this.addMemoryRow(variable);
+        }
 
-            if (this.symbolTable.getActualNode() == j && j > 0) {
+        for (int j = 0; !this.symbolTable.getExecutionFunctions().isEmpty() && j <= this.symbolTable.getCurrentNode(); j++) {
+            Node node = this.symbolTable.getExecutionNode(j);
+
+            /*if (this.symbolTable.getCurrentNode() == j && j > 0) {
                 for (int i = 0; i < node.getArgumentList().size(); i++) {
                     variable = (Variable) node.getArgumentList().values().toArray()[i];
                     this.memoryRows.add(new MemoryRow(variable.getName(), variable.getType().getValue().toString(), variable.getType().getName(), "@" + variable.getType().getOffset()));
                 }
-            }
+            }*/
 
             for (int i = 0; i < node.getVariablesList().size(); i++) {
                 variable = (Variable) node.getVariablesList().values().toArray()[i];
                 // if(!this.memoryRows.contains()){
 
-                if (variable.getType() instanceof PointerVariable) {
-
-                    if (((PointerVariable) variable.getType()).isHasMemory()) {
-                        this.memoryRows.add(new MemoryRow(variable.getName(), "@" + variable.getType().getValue(), variable.getType().getName(), "@" + variable.getType().getOffset()));
-                        this.updateDynamicMemoryRows(variable);
-                    } else {
-                        this.memoryRows.add(new MemoryRow(variable.getName(), variable.getType().getValue().toString(), variable.getType().getName(), "@" + variable.getType().getOffset()));
-                    }
-
-                } else if ((variable.getType() instanceof ArrayType)) {
-
-                    Variable variableArray;
-                    for (int k = 0; k < ((ArrayType) variable.getType()).getMaxPosition(); k++) {
-                        variableArray = ((ArrayType) variable.getType()).getElement(k);
-                        this.memoryRows.add(new MemoryRow(variableArray.getName(), (variableArray.getType().getValue()).toString(), variableArray.getType().getName(), "@" + variableArray.getType().getOffset()));
-                    }
-
-                } else {
-                    this.memoryRows.add(new MemoryRow(variable.getName(), variable.getType().getValue().toString(), variable.getType().getName(), "@" + variable.getType().getOffset()));
-                }
+                this.addMemoryRow(variable);
 
             }
         }
@@ -184,6 +172,29 @@ public class Interpreter {
         this.dynamicMemoryRows.sort(comparator);
 
         return this.memoryRows;
+    }
+
+    private void addMemoryRow(Variable variable) {
+        if (variable.getType() instanceof PointerVariable) {
+
+            if (((PointerVariable) variable.getType()).isHasMemory()) {
+                this.memoryRows.add(new MemoryRow(variable.getName(), "@" + variable.getType().getValue(), variable.getType().getName(), "@" + variable.getType().getOffset()));
+                this.updateDynamicMemoryRows(variable);
+            } else {
+                this.memoryRows.add(new MemoryRow(variable.getName(), variable.getType().getValue().toString(), variable.getType().getName(), "@" + variable.getType().getOffset()));
+            }
+
+        } else if ((variable.getType() instanceof ArrayType)) {
+
+            Variable variableArray;
+            for (int k = 0; k < ((ArrayType) variable.getType()).getMaxPosition(); k++) {
+                variableArray = ((ArrayType) variable.getType()).getElement(k);
+                this.memoryRows.add(new MemoryRow(variableArray.getName(), (variableArray.getType().getValue()).toString(), variableArray.getType().getName(), "@" + variableArray.getType().getOffset()));
+            }
+
+        } else {
+            this.memoryRows.add(new MemoryRow(variable.getName(), variable.getType().getValue().toString(), variable.getType().getName(), "@" + variable.getType().getOffset()));
+        }
     }
 
     private void updateDynamicMemoryRows(Variable variable) {
@@ -224,7 +235,7 @@ public class Interpreter {
         this.controller = controller;
     }
 
-    private void openPopUpView(BasicError basicError){
+    private void openPopUpView(BasicError basicError) {
         Parent root;
         try {
 
@@ -243,8 +254,7 @@ public class Interpreter {
 
             stage.show();
             // Hide this current window (if this is what you want)
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

@@ -40,7 +40,7 @@ public class Declarations {
         ITypes iTypes;
         Random random = new Random();
 
-        if(token.getId() == Type.INT) {
+        if (token.getId() == Type.INT) {
             while (token.getId() != Type.SEMICOLON) {
                 variable = new Variable();
 
@@ -55,6 +55,7 @@ public class Declarations {
                 }
 
                 this.symbolTable.setStaticOffset(this.symbolTable.getStaticOffset() + iTypes.getSize());
+
                 variable.setType(iTypes);
                 variable.setName(token.getLexema());
 
@@ -95,7 +96,7 @@ public class Declarations {
 
                 }
 
-                this.symbolTable.getNode(this.symbolTable.getActualNode()).addVariable(variable);
+                this.symbolTable.getActualNode().addVariable(variable);
 
             }
 
@@ -121,7 +122,7 @@ public class Declarations {
 
         } else if (typeName.equals("int_array")) {
             ArrayType arrayType = new ArrayType(varName, typeName, size, value, offset, maxLength, 0);
-            this.symbolTable.setStaticOffset(this.symbolTable.getStaticOffset()+(size*maxLength));
+            this.symbolTable.setStaticOffset(this.symbolTable.getStaticOffset() + (size * maxLength));
             return arrayType;
         }
 

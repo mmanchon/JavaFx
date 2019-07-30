@@ -2,15 +2,13 @@ package Interpreter;
 
 import Interpreter.FileReader.Reader;
 import Interpreter.SymbolTable.Node;
+import Interpreter.SymbolTable.Objects.Parameter;
 import Interpreter.SymbolTable.Objects.PointerVariable;
-import Interpreter.SymbolTable.Objects.Variable;
 import Interpreter.SymbolTable.SymbolTable;
 import Interpreter.SymbolTable.Types.ArrayType;
 import Interpreter.SymbolTable.Types.ITypes;
 import Interpreter.Tokens.Token;
 import Interpreter.Tokens.Type;
-
-import java.util.Random;
 
 public class Headers {
 
@@ -25,6 +23,7 @@ public class Headers {
     public Token readFunctionsHeaders(Token token, SymbolTable symbolTable){
         this.symbolTable = symbolTable;
         Node node = new Node();
+
 
         while(token.getId() != Type.INT && token.getId() != Type.VOID){
             token = this.reader.extractToken();
@@ -58,9 +57,10 @@ public class Headers {
         token = this.reader.extractToken();
         token = this.reader.extractToken();
 
-        this.symbolTable.setActualNode(0);
-        this.symbolTable.getNode(this.symbolTable.getActualNode()).setNodeName("main");
-        //this.symbolTable.getNode(this.symbolTable.getActualNode()).
+        this.symbolTable.setCurrentNode(0);
+        System.out.println(this.symbolTable.toString());
+        //this.symbolTable.getEmptyFunction(this.symbolTable.getCurrentNode()).setNodeName("main");
+        //this.symbolTable.getEmptyFunction(this.symbolTable.getCurrentNode()).
         return token;
     }
 
@@ -70,7 +70,7 @@ public class Headers {
 
     public Token extractFunction(Token token, Node node){
 
-        Variable variable;
+        Parameter variable;
         Token aux;
 
         node.setNodeName(token.getLexema()); // nuevo nodo donde guardamos la funcion
@@ -78,11 +78,9 @@ public class Headers {
         token = this.reader.extractToken();
         token = this.reader.extractToken();
 
-        this.symbolTable.setActualNode(this.symbolTable.getActualNode()+1);
-
         while(token.getId() != Type.CLOSE_PAR){
 
-            variable = new Variable();
+            variable = new Parameter();
 
             if(token.getId() == Type.INT){
 
@@ -101,21 +99,23 @@ public class Headers {
                     token = this.reader.extractToken();
                     //close bra
                     token = this.reader.extractToken();
+                    variable.setReference(true);
                 }else if(aux.getId() == Type.ID_POINTER) {
                     variable.setName(aux.getLexema());
                     variable.setType(this.createIntArgument(token.getLexema(), "int_pointer", this.symbolTable.getStaticOffset() + 4, 4, 0, 0));
-
+                    variable.setReference(true);
                 } else if(aux.getId() == Type.ID){
                     variable.setName(aux.getLexema());
                     variable.setType(this.createIntArgument(token.getLexema(), "int", this.symbolTable.getStaticOffset() + 4, 4, 0, 0));
-
+                    variable.setReference(false);
                 }
 
-               node.addArgument(variable);
+               node.addVariable(variable); //hacerlo como variable
             }
 
             if(token.getId() != Type.CLOSE_PAR) token = this.reader.extractToken();
         }
+
 
         token = this.reader.extractToken();
         token = this.reader.extractToken();
@@ -126,7 +126,9 @@ public class Headers {
             token = this.reader.extractToken();
         }
 
-        this.symbolTable.addNode(node);
+        this.symbolTable.addEmptyFunctions(node);
+
+        this.symbolTable.setCurrentNode(this.symbolTable.getCurrentNode()+1);
 
         token = this.readFunctionsHeaders(token,this.symbolTable);
 

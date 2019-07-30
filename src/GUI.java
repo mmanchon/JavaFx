@@ -47,7 +47,7 @@ public class GUI extends Application {
         Scene scene = new Scene(rootLayout);
 
 
-        this.stage.setMaximized(true);
+       // this.stage.setMaximized(true);
         this.stage.setTitle("Memory Debug");
         this.stage.setScene(scene);
         this.interpreter.setController(staticController);

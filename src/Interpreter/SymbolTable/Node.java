@@ -29,6 +29,8 @@ public class Node {
 
     private int returnLine;
 
+    private String returnVariable;
+
     private int returnNode;
 
     public Node(){
@@ -141,7 +143,13 @@ public class Node {
         this.contextsList.remove(this.contextsList.size()-1);
     }
 
+    public String getReturnVariable() {
+        return returnVariable;
+    }
 
+    public void setReturnVariable(String returnVariable) {
+        this.returnVariable = returnVariable;
+    }
 
     @Override
     public String toString(){

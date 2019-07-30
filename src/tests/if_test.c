@@ -4,7 +4,7 @@ int main(){
     int b = 0;
 
 
-    a = 3;
+    a = 1;
 
     if(a >= 2){
         a = 1;
