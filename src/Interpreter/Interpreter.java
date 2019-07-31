@@ -43,10 +43,10 @@ public class Interpreter {
     public Interpreter() {
         this.reader = new Reader();
 
-
         this.headers = new Headers(reader, symbolTable);
         this.declarations = new Declarations(reader, symbolTable);
         this.instructions = new Instructions(reader, symbolTable);
+
     }
 
     public void setNewFile(File file) {
@@ -69,8 +69,8 @@ public class Interpreter {
 
             if (this.token.getId() == Type.CLOSE_KEY) {
 
-                if (!this.symbolTable.getActualNode().hasContext()) {
-                    Context context = this.symbolTable.getActualNode().getLastContext();
+                if (!this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).hasContext()) {
+                    Context context = this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getLastContext();
 
                     if (context.getTypeOfContext() == Type.IF) {
                         this.token = this.reader.extractToken();
@@ -81,9 +81,9 @@ public class Interpreter {
                             }
                         }
 
-                        this.symbolTable.getActualNode().removeLastContext();
+                        this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).removeLastContext();
                     } else if (context.getTypeOfContext() == Type.ELSE) {
-                        this.symbolTable.getActualNode().removeLastContext();
+                        this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).removeLastContext();
 
                     } else if (context.getTypeOfContext() == Type.DO) {
 
@@ -96,12 +96,12 @@ public class Interpreter {
                         ITypes iTypes = variable.getType();
                         iTypes.setValue(String.valueOf(Integer.valueOf(iTypes.getValue().toString()) + Integer.valueOf(loop.getIncrementValue().toString())));
                         variable.setType(iTypes);
-                        this.symbolTable.getActualNode().addVariable(variable);
+                        this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).addVariable(variable);
 
                         if (loop.analyseOperand()) {
                             this.reader.goToLine(context.getLineNumber());
                         } else {
-                            this.symbolTable.getActualNode().removeLastContext();
+                            this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).removeLastContext();
                         }
 
                     }
@@ -110,19 +110,21 @@ public class Interpreter {
                     while (token.getId() == Type.LINE_BREAK) {
                         token = this.reader.extractToken();
                     }
-                } else if (!this.symbolTable.getExecutionFunctions().isEmpty()) {
 
-                    this.reader.goToLine(this.symbolTable.getActualNode().getReturnLine());
-                    this.symbolTable.getActualNode().deleteAllData();
-                    this.symbolTable.removeExecutionFunction();
+                } else if (this.symbolTable.getCurrentNode() > 0) {
+
+                    this.reader.goToLine(this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getReturnLine()+1);
+                    this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).deleteAllData();
+                    this.symbolTable.removeExecutionNode(this.symbolTable.getCurrentNode());
+                    this.symbolTable.setCurrentNode(this.symbolTable.getCurrentNode()-1);
 
                 }
 
 
             }
-
+            Token aux = this.token;
             this.token = this.declarations.readDeclarations(token, symbolTable);
-            this.token = this.instructions.readInstruction(this.token, this.symbolTable);
+            if(aux == this.token) this.token = this.instructions.readInstruction(this.token, this.symbolTable);
 
 
             if (!(text = this.instructions.getText()).equals("")) {
@@ -142,25 +144,12 @@ public class Interpreter {
         this.dynamicMemoryRows.remove(0, this.dynamicMemoryRows.size());
         this.memoryRows.remove(0, this.memoryRows.size());
 
-        for (int i = 0; i < this.symbolTable.getMain().getVariablesList().size(); i++) {
-            variable = (Variable) this.symbolTable.getMain().getVariablesList().values().toArray()[i];
-            System.out.println(this.symbolTable.toString());
-            this.addMemoryRow(variable);
-        }
 
         for (int j = 0; !this.symbolTable.getExecutionFunctions().isEmpty() && j <= this.symbolTable.getCurrentNode(); j++) {
             Node node = this.symbolTable.getExecutionNode(j);
 
-            /*if (this.symbolTable.getCurrentNode() == j && j > 0) {
-                for (int i = 0; i < node.getArgumentList().size(); i++) {
-                    variable = (Variable) node.getArgumentList().values().toArray()[i];
-                    this.memoryRows.add(new MemoryRow(variable.getName(), variable.getType().getValue().toString(), variable.getType().getName(), "@" + variable.getType().getOffset()));
-                }
-            }*/
-
             for (int i = 0; i < node.getVariablesList().size(); i++) {
                 variable = (Variable) node.getVariablesList().values().toArray()[i];
-                // if(!this.memoryRows.contains()){
 
                 this.addMemoryRow(variable);
 

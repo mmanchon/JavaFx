@@ -26,7 +26,6 @@ public class Declarations {
         this.symbolTable = symbolTable;
 
         if (token.getId() == Type.INT) {
-
             token = this.isIntDeclaration(token);
 
         }
@@ -96,7 +95,7 @@ public class Declarations {
 
                 }
 
-                this.symbolTable.getActualNode().addVariable(variable);
+                this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).addVariable(variable);
 
             }
 

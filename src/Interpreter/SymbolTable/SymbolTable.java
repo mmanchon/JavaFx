@@ -1,5 +1,6 @@
 package Interpreter.SymbolTable;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 public class SymbolTable {
@@ -8,20 +9,17 @@ public class SymbolTable {
     private int staticOffset;
     private int dynamicOffset;
 
-    private Vector emptyFunctions;
+    private ArrayList emptyFunctions;
 
-    private Node main;
-
-    private Vector executionFunctions;
+    private ArrayList executionFunctions;
 
 
     public SymbolTable() {
         this.currentNode = 0;
         this.staticOffset = -4;
         this.dynamicOffset = 0;
-        this.emptyFunctions = new Vector();
-        this.executionFunctions = new Vector();
-        this.main = new Node();
+        this.emptyFunctions = new ArrayList();
+        this.executionFunctions = new ArrayList();
     }
 
     public void addEmptyFunctions(Node node) {
@@ -30,7 +28,10 @@ public class SymbolTable {
 
     public void addxecutionFunctions(Node node) {
         this.executionFunctions.add(this.currentNode, node);
+    }
 
+    public void substituteExecutionNode(Node node){
+        this.executionFunctions.set(this.executionFunctions.indexOf(node),node);
     }
 
 
@@ -62,16 +63,21 @@ public class SymbolTable {
         this.dynamicOffset = dynamicOffset;
     }
 
-    public Vector getEmptyFunctions() {
+    public ArrayList getEmptyFunctions() {
         return emptyFunctions;
     }
 
-    public void setEmptyFunctions(Vector emptyFunctions) {
+    public void setEmptyFunctions(ArrayList emptyFunctions) {
         this.emptyFunctions = emptyFunctions;
     }
 
-    public void removeNode(int index) {
+    public void removeEmptyNode(int index) {
         this.emptyFunctions.remove(this.getEmptyFunction(index));
+    }
+
+    public void removeExecutionNode(int index) {
+       this.executionFunctions.remove(this.executionFunctions.get(index));
+
     }
 
     public Node isFunction(String function) {
@@ -100,10 +106,9 @@ public class SymbolTable {
     @Override
     public String toString() {
         String result = "<TaulaSimbols>\n";
-        result += "\t<main>\n" +this.main.toString()+"\t</main>\n";
         result += "\t<Blocs>\n";
-        for (int i = 0; i < this.emptyFunctions.size(); i++)
-            result += getEmptyFunction(i).toString();
+        for (int i = 0; i < this.executionFunctions.size(); i++)
+            result += getExecutionNode(i).toString();
         result += "\t</Blocs>\n";
         result += "</TaulaSimbols>";
         return result;
@@ -112,37 +117,28 @@ public class SymbolTable {
 
     public void deleteAllData() {
         if(!this.emptyFunctions.isEmpty()) {
-            for (int i = 0; i < this.currentNode + 1; i++) {
+            for (int i = 0; i < this.emptyFunctions.size(); i++) {
                 ((Node) this.emptyFunctions.get(i)).deleteAllData();
+            }
+        }
+        if(!this.executionFunctions.isEmpty()) {
+            for (int i = 0; i < this.executionFunctions.size(); i++) {
+                ((Node) this.executionFunctions.get(i)).deleteAllData();
             }
         }
         this.currentNode = 0;
 
     }
 
-    public Node getMain() {
-        return main;
-    }
 
-    public void setMain(Node main) {
-        this.main = main;
-    }
-
-    public Vector getExecutionFunctions() {
+    public ArrayList getExecutionFunctions() {
         return executionFunctions;
     }
 
-    public void setExecutionFunctions(Vector executionFunctions) {
+    public void setExecutionFunctions(ArrayList executionFunctions) {
         this.executionFunctions = executionFunctions;
     }
 
-    public Node getActualNode() {
-        if (this.getExecutionFunctions().isEmpty()) {
-            return this.main;
-        } else {
-            return (Node) this.executionFunctions.get(this.currentNode);
-        }
-    }
 
     public void removeExecutionFunction(){
         this.executionFunctions.remove(this.currentNode);

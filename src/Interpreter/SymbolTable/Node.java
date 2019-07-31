@@ -9,13 +9,11 @@ import javax.xml.bind.TypeConstraintException;
 import java.util.Hashtable;
 import java.util.Vector;
 
-public class Node {
+public class Node implements Cloneable{
 
     private Hashtable contantsList = new Hashtable();
 
     private Hashtable variablesList = new Hashtable();
-
-    private Hashtable argumentList = new Hashtable();
 
     private Vector contextsList = new Vector();
 
@@ -25,16 +23,20 @@ public class Node {
 
     private Type returnType;
 
-    private Object returnValue;
-
     private int returnLine;
 
     private String returnVariable;
 
-    private int returnNode;
+    public Node(){ }
 
-    public Node(){
-        this.returnValue = null;
+    public Node(Node node){
+        this.contextsList = (Vector) node.getContextsList().clone();
+        this.variablesList = (Hashtable) node.getVariablesList().clone();
+        this.nodeName = node.getNodeName();
+        this.nodeLine = node.getNodeLine();
+        this.returnType = node.getReturnType();
+        this.returnLine = node.getReturnLine();
+        this.returnVariable = node.getReturnVariable();
     }
 
     public void addConstant(Constant constant){
@@ -43,14 +45,6 @@ public class Node {
 
     public void addVariable(Variable variable){
         this.variablesList.put(variable.getName(),variable);
-    }
-
-    public void addArgument(Variable variable){
-        this.argumentList.put(variable.getName(),variable);
-    }
-
-    public Hashtable getArgumentList() {
-        return argumentList;
     }
 
     public void addContext(Context context){this.contextsList.add(context);}
@@ -63,9 +57,6 @@ public class Node {
         return (Variable) this.variablesList.get(name);
     }
 
-    public Variable getArgument(String name){
-        return (Variable) this.argumentList.get(name);
-    }
 
     public Hashtable getVariablesList(){
         return this.variablesList;
@@ -107,23 +98,7 @@ public class Node {
         this.returnLine = returnLine;
     }
 
-    public int getReturnNode() {
-        return returnNode;
-    }
-
-    public void setReturnNode(int returnNode) {
-        this.returnNode = returnNode;
-    }
-
-    public Object getReturnValue() {
-        return returnValue;
-    }
-
-    public void setReturnValue(Object returnValue) {
-        this.returnValue = returnValue;
-    }
-
-    public Context getContext(int index){
+   public Context getContext(int index){
         return (Context) this.contextsList.get(index);
     }
 
@@ -155,7 +130,7 @@ public class Node {
     public String toString(){
         String result = "\t\t<Bloc>\n";
 
-        result += "\t\t\t<Name= "+this.nodeName+" Line="+this.nodeLine+">\n";
+        result += "\t\t\t<Name= "+this.nodeName+" Line="+this.nodeLine+" ReturnVariable = "+this.returnVariable+">\n";
         result += "\t\t\t<Constants>\n";
         for (int i=0; i<this.contantsList.size(); i++)
             result += ((Constant)this.contantsList.values().toArray()[i]).toString();
@@ -166,10 +141,7 @@ public class Node {
             result += (this.variablesList.values().toArray()[i]).toString();
         result += "\t\t\t</Variables>\n";
 
-        result += "\t\t\t<Arguments>\n";
-        for (int i=0; i<this.argumentList.size(); i++)
-            result += (this.argumentList.values().toArray()[i]).toString();
-        result += "\t\t\t</Arguments>\n";
+
 
         result += "\t\t</Bloc>\n";
         return result;
@@ -178,6 +150,9 @@ public class Node {
     public void deleteAllData(){
         this.contantsList.clear();
         this.variablesList.clear();
-        this.argumentList.clear();
+    }
+
+    public Object clone()throws CloneNotSupportedException{
+        return super.clone();
     }
 }

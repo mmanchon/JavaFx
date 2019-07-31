@@ -48,7 +48,7 @@ public class Instructions {
             if (!this.isTrueCondition()) {
 
                 this.jumpIf(token);
-                this.symbolTable.getActualNode().removeLastContext();
+                this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).removeLastContext();
 
                 token = this.reader.extractToken();
 
@@ -69,7 +69,7 @@ public class Instructions {
 
             if (!this.isTrueCondition()) {
                 this.jumpIf(token);
-                this.symbolTable.getActualNode().removeLastContext();
+                this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).removeLastContext();
                 token = this.reader.extractToken();
             }
         } else if (token.getId() == Type.WHILE) {
@@ -77,21 +77,29 @@ public class Instructions {
         } else if (token.getId() == Type.RETURN) {
             token = this.reader.extractToken();
             Node node;
-            /*if((node = this.symbolTable.getPreviousNode()) == null ){
-                node = this.symbolTable.getMain();
-                node.getVariable(this.symbolTable.getActualNode().getReturnVariable()).getType().setValue();
-            }else{
+            if((node = this.symbolTable.getPreviousNode()) != null ){
 
-            }*/
-            if (token.getId() == Type.INT_CNST) {
-                this.symbolTable.getActualNode().setReturnValue(token.getLexema());
-            } else if (token.getId() == Type.ID) {
-                this.symbolTable.getActualNode().setReturnValue(this.symbolTable.getActualNode().getVariable(token.getLexema()));
+                if (token.getId() == Type.INT_CNST) {
+                    node.getVariable(this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getReturnVariable()).getType().setValue(token.getLexema());
+                    this.symbolTable.setCurrentNode(this.symbolTable.getCurrentNode()-1);
+                    this.symbolTable.substituteExecutionNode(node);
+                    this.symbolTable.setCurrentNode(this.symbolTable.getCurrentNode()+1);
+
+                } else if (token.getId() == Type.ID) {
+                    node.getVariable(this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getReturnVariable()).getType().setValue(this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema()).getType().getValue());
+                    this.symbolTable.setCurrentNode(this.symbolTable.getCurrentNode()-1);
+                    this.symbolTable.substituteExecutionNode(node);
+                    this.symbolTable.setCurrentNode(this.symbolTable.getCurrentNode()+1);
+                }
+
             }
 
-            this.reader.goToLine(this.symbolTable.getActualNode().getReturnLine());
-            this.symbolTable.getActualNode().deleteAllData();
-            this.symbolTable.setCurrentNode(this.symbolTable.getActualNode().getReturnNode());
+
+            this.reader.goToLine(this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getReturnLine()+1);
+            this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).deleteAllData();
+            this.symbolTable.removeExecutionNode(this.symbolTable.getCurrentNode());
+            this.symbolTable.setCurrentNode(this.symbolTable.getCurrentNode()-1);
+
 
             token = this.reader.extractToken();
             token = this.reader.extractToken();
@@ -106,7 +114,7 @@ public class Instructions {
                 if (token.getId() == Type.STRING) {
                     this.text = this.text + token.getLexema();
                 } else if (token.getId() == Type.ID || token.getId() == Type.ID_POINTER) {
-                    Variable variable = this.symbolTable.getActualNode().getVariable(token.getLexema());
+                    Variable variable = this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema());
                     this.text = this.text + variable.getType().getValue().toString();
                 }
                 token = this.reader.extractToken();
@@ -120,7 +128,7 @@ public class Instructions {
             token = this.reader.extractToken();
             //TODO: Detect if variable exists
 
-            Variable variable = this.symbolTable.getActualNode().getVariable(token.getLexema());
+            Variable variable = this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema());
 
             token = this.reader.extractToken();
             token = this.reader.extractToken();
@@ -141,13 +149,13 @@ public class Instructions {
 
         if (token.getId() == Type.ID || token.getId() == Type.ID_POINTER) {
 
-            Variable variable = this.symbolTable.getActualNode().getVariable(token.getLexema());
+            Variable variable = this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema());
             PointerVariable pointerVariable = (PointerVariable) variable.getType();
             pointerVariable.setHasMemory(false);
             pointerVariable.removeAllElements();
             pointerVariable.setValue("null");
             variable.setType(pointerVariable);
-            this.symbolTable.getActualNode().addVariable(variable);
+            this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).addVariable(variable);
 
         }
         token = this.reader.extractToken();
@@ -162,14 +170,14 @@ public class Instructions {
         Token aux = token;
 
 
-        variable = this.symbolTable.getActualNode().getVariable(token.getLexema());
+        variable = this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema());
 
 
         token = this.reader.extractToken();
 
         if (token.getId() == Type.EQUAL) {
 
-            token = this.assignment(variable);
+            token = this.assignment(aux,variable);
 
         } else if (token.getId() == Type.OPEN_BRA) {
 
@@ -214,11 +222,11 @@ public class Instructions {
         }
 
 
-        this.symbolTable.getActualNode().addVariable(variable);
+        this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).addVariable(variable);
 
     }
 
-    private Token assignment(Variable variable) {
+    private Token assignment(Token nameVariable,Variable variable) {
         ITypes iTypes;
 
         Token token = this.reader.extractToken();
@@ -228,10 +236,12 @@ public class Instructions {
             iTypes.setValue(token.getLexema());
 
             variable.setType(iTypes);
+            this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).addVariable(variable);
 
         } else if (token.getId() == Type.MALLOC) {
 
             token = this.askMemory(token, variable);
+            this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).addVariable(variable);
 
         } else if (token.getId() == Type.AND) {
 
@@ -241,11 +251,12 @@ public class Instructions {
 
                 iTypes = variable.getType();
 
-                iTypes.setValue(this.symbolTable.getActualNode().getVariable(token.getLexema()).getType().getOffset());
+                iTypes.setValue(this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema()).getType().getOffset());
 
                 variable.setType(iTypes);
 
             }
+            this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).addVariable(variable);
 
         } else if (token.getId() == Type.ID) {
 
@@ -253,17 +264,17 @@ public class Instructions {
 
             if ((node = this.symbolTable.isFunction(token.getLexema())) != null) {
                 this.analyseFunction(token, variable,node);
+                this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).setReturnVariable(nameVariable.getLexema());
             } else {
                 iTypes = variable.getType();
 
-                iTypes.setValue(this.symbolTable.getActualNode().getVariable(token.getLexema()).getType().getValue());
+                iTypes.setValue(this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema()).getType().getValue());
 
                 variable.setType(iTypes);
             }
         }
 
 
-        this.symbolTable.getActualNode().addVariable(variable);
 
 
         token = this.reader.extractToken();
@@ -299,7 +310,7 @@ public class Instructions {
 
         if (token.getId() == Type.ID) {
 
-            index = Integer.valueOf(this.symbolTable.getActualNode().getVariable(token.getLexema()).getType().getValue().toString());
+            index = Integer.valueOf(this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema()).getType().getValue().toString());
 
 
         } else {
@@ -324,13 +335,13 @@ public class Instructions {
         } else if (token.getId() == Type.ID) {
 
 
-            arrayType.setElement(index, this.symbolTable.getActualNode().getVariable(token.getLexema()).getType().getValue());
+            arrayType.setElement(index, this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema()).getType().getValue());
 
 
         }
 
 
-        this.symbolTable.getActualNode().addVariable(variable);
+        this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).addVariable(variable);
 
 
         token = this.reader.extractToken();
@@ -367,7 +378,7 @@ public class Instructions {
         context.setLineNumber(this.reader.getNumLines());
 
 
-        this.symbolTable.getActualNode().addContext(context);
+        this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).addContext(context);
 
 
         return token;
@@ -375,7 +386,7 @@ public class Instructions {
 
     private boolean isTrueCondition() {
 
-        return this.symbolTable.getActualNode().getLastContext().getLastCondition().analyseOperand();
+        return this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getLastContext().getLastCondition().analyseOperand();
 
 
     }
@@ -392,7 +403,7 @@ public class Instructions {
         if (token.getId() == Type.ID || token.getId() == Type.ID_POINTER) {
 
 
-            condition.setLeftSideCondition(this.symbolTable.getActualNode().getVariable(token.getLexema()));
+            condition.setLeftSideCondition(this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema()));
 
 
         } else if (token.getId() == Type.INT_CNST) {
@@ -409,7 +420,7 @@ public class Instructions {
 
         if (token.getId() == Type.ID || token.getId() == Type.ID_POINTER) {
 
-            condition.setRightSideCondition(this.symbolTable.getActualNode().getVariable(token.getLexema()));
+            condition.setRightSideCondition(this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema()));
 
         } else if (token.getId() == Type.INT_CNST) {
             condition.setRightSideCondition(token.getLexema());
@@ -419,7 +430,7 @@ public class Instructions {
     }
 
     private Token analyseForSentence() {
-        Token token;
+        Token token, aux;
         Loop loop = new Loop();
         Context context = new Context();
 
@@ -427,13 +438,13 @@ public class Instructions {
 
         token = this.reader.extractToken();
         token = this.reader.extractToken();
-
+        aux = token;
         if (token.getId() == Type.ID || token.getId() == Type.ID_POINTER) {
-            Variable variable = this.symbolTable.getActualNode().getVariable(token.getLexema());
+            Variable variable = this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema());
 
             token = this.reader.extractToken();
 
-            this.assignment(variable); //avanza hasta la ','
+            this.assignment(aux,variable); //avanza hasta la ','
 
             token = this.reader.extractToken();
 
@@ -470,7 +481,7 @@ public class Instructions {
 
             context.setLineNumber(this.reader.getNumLines());
 
-            this.symbolTable.getActualNode().addContext(context);
+            this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).addContext(context);
 
         }
 
@@ -486,49 +497,27 @@ public class Instructions {
     }
 
     private Token analyseFunction(Token token, Variable variable, Node node) {
-        Node aux;
-        ITypes iTypes;
         if (node != null) {
             if (node.getReturnType() != Type.VOID) {
 
-                if ((aux = this.symbolTable.getFunction(token.getLexema())) == null) {
+//                if ((aux = this.symbolTable.getFunction(token.getLexema())) == null) {
                     //TODO: ARGUMENTS
                     if (node.getVariablesList().size() != 0) this.extractArguments(token, node);
 
                     node.setReturnLine(this.reader.getNumLines());
                     this.reader.setNumLines(node.getNodeLine());
                     this.reader.goToLine(node.getNodeLine());
-                    node.setReturnNode(this.symbolTable.getCurrentNode());
+                    node.setReturnVariable(token.getLexema());
                     this.symbolTable.setCurrentNode(this.symbolTable.getCurrentNode()+1);
-                    this.symbolTable.addxecutionFunctions(node);
-
-
-                } else {
-
-                    iTypes = variable.getType();
-
-                    if (aux.getReturnValue() instanceof Variable) {
-                        iTypes.setValue(variable.getType().getValue());
-                    } else {
-                        iTypes.setValue(aux.getReturnValue());
-                    }
-
-                    variable.setType(iTypes);
-                    while (token.getId() != Type.CLOSE_PAR) {
-                        token = this.reader.extractToken();
-                    }
-
-                    this.symbolTable.removeExecutionFunction();
-                }
+                    this.symbolTable.addxecutionFunctions(new Node(node));
 
             } else {
 
                 node.setReturnLine(this.reader.getNumLines() + 1);
                 this.reader.setNumLines(node.getNodeLine());
                 this.reader.goToLine(node.getNodeLine());
-                node.setReturnNode(this.symbolTable.getCurrentNode());
                 this.symbolTable.setCurrentNode(this.symbolTable.getCurrentNode()+1);
-                this.symbolTable.addxecutionFunctions(node);
+                this.symbolTable.addxecutionFunctions(new Node(node));
 
             }
         }
@@ -543,7 +532,7 @@ public class Instructions {
         Variable variable1, variable;
 
         for (int i = 0; i < node.getVariablesList().size(); i++) {
-            variable1 = this.symbolTable.getActualNode().getVariable(token.getLexema());
+            variable1 = this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema());
 
             variable = (Variable) node.getVariablesList().values().toArray()[i];
             variable.getType().setValue(variable1.getType().getValue());

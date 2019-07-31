@@ -58,8 +58,8 @@ public class Headers {
         token = this.reader.extractToken();
 
         this.symbolTable.setCurrentNode(0);
-        System.out.println(this.symbolTable.toString());
-        //this.symbolTable.getEmptyFunction(this.symbolTable.getCurrentNode()).setNodeName("main");
+        this.symbolTable.addxecutionFunctions(new Node());
+        this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).setNodeName("main");
         //this.symbolTable.getEmptyFunction(this.symbolTable.getCurrentNode()).
         return token;
     }
