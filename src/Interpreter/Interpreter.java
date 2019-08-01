@@ -8,7 +8,7 @@ import GUI.Models.MemoryRow;
 import Interpreter.SymbolTable.*;
 import Interpreter.SymbolTable.Contexts.Context;
 import Interpreter.SymbolTable.Contexts.Loop;
-import Interpreter.SymbolTable.Objects.PointerVariable;
+import Interpreter.SymbolTable.Types.PointerVariable;
 import Interpreter.SymbolTable.Objects.Variable;
 import Interpreter.SymbolTable.Types.ArrayType;
 import Interpreter.SymbolTable.Types.ITypes;

@@ -7,7 +7,7 @@ import Interpreter.SymbolTable.*;
 import Interpreter.SymbolTable.Contexts.Condition;
 import Interpreter.SymbolTable.Contexts.Context;
 import Interpreter.SymbolTable.Contexts.Loop;
-import Interpreter.SymbolTable.Objects.PointerVariable;
+import Interpreter.SymbolTable.Types.PointerVariable;
 import Interpreter.SymbolTable.Objects.Variable;
 import Interpreter.SymbolTable.Types.ArrayType;
 import Interpreter.SymbolTable.Types.ITypes;
@@ -31,7 +31,7 @@ public class Instructions {
     public Token readInstruction(Token token, SymbolTable symbolTable) throws BasicError {
         this.symbolTable = symbolTable;
 
-        if (token.getId() == Type.ID) {
+        if (token.getId() == Type.ID || token.getId() == Type.ID_POINTER) {
 
             token = this.variable(token);
 
@@ -187,7 +187,8 @@ public class Instructions {
             token = this.reader.extractToken();
 
             if (token.getId() == Type.PLUS) {
-                this.incrementVariableValue(variable);
+                this.incrementVariableValue(variable,aux.getId() == Type.ID);
+
             }
 
             token = this.reader.extractToken();
@@ -207,18 +208,28 @@ public class Instructions {
         return token;
     }
 
-    private void incrementVariableValue(Variable variable) {
-        if (variable.getType() instanceof PointerVariable) {
+    private void incrementVariableValue(Variable variable, boolean isID) {
+        if (isID) {
 
-            PointerVariable pointerVariable = (PointerVariable) variable.getType();
-            pointerVariable.setValue(Integer.valueOf((pointerVariable.getValue().toString()).split("@")[0]) + 4);
-            variable.setType(pointerVariable);
+            if(variable.getType() instanceof PointerVariable) {
+                PointerVariable pointerVariable = (PointerVariable) variable.getType();
+                pointerVariable.setValue(Integer.parseInt((pointerVariable.getValue().toString()).split("@")[0]) + 4);
+                variable.setType(pointerVariable);
 
+            }else{
+                ITypes iTypes = variable.getType();
+                iTypes.setValue((Integer.parseInt(iTypes.getValue().toString()) + 1));
+                variable.setType(iTypes);
+
+            }
         } else {
 
-            ITypes iTypes = variable.getType();
-            iTypes.setValue((Integer.valueOf(iTypes.getValue().toString()) + 1));
+/*            ITypes iTypes = variable.getType();
+            iTypes.setValue((Integer.parseInt(iTypes.getValue().toString()) + 1));
             variable.setType(iTypes);
+*/
+            this.incrementReferencedValue(variable,1); //Funcion para cambiar el valor de referencia
+
         }
 
 
@@ -232,12 +243,17 @@ public class Instructions {
         Token token = this.reader.extractToken();
         if (token.getId() == Type.INT_CNST) {
 
-            iTypes = variable.getType();
-            iTypes.setValue(token.getLexema());
+            if(nameVariable.getId() == Type.ID) {
+                iTypes = variable.getType();
+                iTypes.setValue(token.getLexema());
 
-            variable.setType(iTypes);
-            this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).addVariable(variable);
-
+                variable.setType(iTypes);
+                this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).addVariable(variable);
+            }else {
+                if (variable.getType() instanceof PointerVariable) {
+                    this.changeReferencedValue(variable, token.getLexema()); //Funcion para cambiar el valor de referencia
+                }
+            }
         } else if (token.getId() == Type.MALLOC) {
 
             token = this.askMemory(token, variable);
@@ -512,7 +528,7 @@ public class Instructions {
                     this.symbolTable.addxecutionFunctions(new Node(node));
 
             } else {
-
+                if (node.getVariablesList().size() != 0) this.extractArguments(token, node);
                 node.setReturnLine(this.reader.getNumLines() + 1);
                 this.reader.setNumLines(node.getNodeLine());
                 this.reader.goToLine(node.getNodeLine());
@@ -526,28 +542,64 @@ public class Instructions {
     }
 
     private Token extractArguments(Token token, Node node) {
-        token = this.reader.extractToken();
-        token = this.reader.extractToken();
+        token = this.reader.extractToken();//variable
 
-        Variable variable1, variable;
 
-        for (int i = 0; i < node.getVariablesList().size(); i++) {
-            variable1 = this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema());
+        Variable variable1, argument;
 
-            variable = (Variable) node.getVariablesList().values().toArray()[i];
-            variable.getType().setValue(variable1.getType().getValue());
-            variable.getType().setOffset(this.symbolTable.getStaticOffset()+4);
-            this.symbolTable.setStaticOffset(this.symbolTable.getStaticOffset() + variable.getType().getSize());
-            node.addVariable(variable);
+        for (int i = 0; token.getId() != Type.CLOSE_PAR && i < node.getVariablesList().size(); i++) {
+
+
+            if(token.getId() == Type.AND){
+                token = this.reader.extractToken();//gets variable name may be &
+
+                variable1 = this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema());
+                argument = (Variable) node.getVariablesList().values().toArray()[i];
+
+               // token = this.reader.extractToken();//gets variable name
+                argument.getType().setValue(variable1.getType().getOffset());
+                ((PointerVariable)argument.getType()).setNodeReferenced(this.symbolTable.getCurrentNode());
+                ((PointerVariable)argument.getType()).setPointerVariable(variable1);
+
+            }else{
+                variable1 = this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema());
+                argument = (Variable) node.getVariablesList().values().toArray()[i];
+                argument.getType().setValue(variable1.getType().getValue());
+            }
+
+
+            if(variable1.getType() instanceof PointerVariable){
+
+            }else if(variable1.getType() instanceof ArrayType){
+
+            }else{
+
+            }
+            argument.getType().setOffset(this.symbolTable.getStaticOffset()+4);
+            this.symbolTable.setStaticOffset(this.symbolTable.getStaticOffset() + argument.getType().getSize());
+            node.addVariable(argument);
 
             token = this.reader.extractToken();
-            if (token.getId() != Type.CLOSE_PAR) token = this.reader.extractToken();
 
         }
 
 
         return token;
     }
+
+    private void changeReferencedValue(Variable variable, Object newValue){
+        while(variable != null && variable.getType() instanceof PointerVariable && ((PointerVariable)variable.getType()).getNodeReferenced() != -1){
+            this.symbolTable.getExecutionNode(((PointerVariable)variable.getType()).getNodeReferenced()).getVariable(((Variable)((PointerVariable)variable.getType()).getPointerVariable()).getName()).getType().setValue(newValue);
+            variable = (Variable) ((PointerVariable)variable.getType()).getPointerVariable();
+        }
+    }
+    private void incrementReferencedValue(Variable variable, Object increment){
+        while(variable != null && variable.getType() instanceof PointerVariable && ((PointerVariable)variable.getType()).getNodeReferenced() != -1){
+            this.symbolTable.getExecutionNode(((PointerVariable)variable.getType()).getNodeReferenced()).getVariable(((Variable)((PointerVariable)variable.getType()).getPointerVariable()).getName()).getType().setValue(Integer.parseInt(increment.toString())+Integer.parseInt(this.symbolTable.getExecutionNode(((PointerVariable)variable.getType()).getNodeReferenced()).getVariable(((Variable)((PointerVariable)variable.getType()).getPointerVariable()).getName()).getType().getValue().toString()));
+            variable = (Variable) ((PointerVariable)variable.getType()).getPointerVariable();
+        }
+    }
+
 
     public String getText() {
         String aux = text;

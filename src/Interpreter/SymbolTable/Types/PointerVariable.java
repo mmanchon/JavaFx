@@ -1,4 +1,4 @@
-package Interpreter.SymbolTable.Objects;
+package Interpreter.SymbolTable.Types;
 
 import Interpreter.SymbolTable.Types.ArrayType;
 
@@ -6,8 +6,12 @@ public class PointerVariable extends ArrayType {
 
     private boolean hasMemory = false;
     private Object pointerOffset;
+    private Object pointerVariable;
+    private int nodeReferenced;
 
     public PointerVariable(){
+        this.pointerVariable = null;
+        this.nodeReferenced = -1;
     }
 
     public PointerVariable(String varName, String name, int size, Object value, int offset, int minPosition, int maxPosition, boolean hasMemory) {
@@ -35,6 +39,26 @@ public class PointerVariable extends ArrayType {
 
     public void setOffset(Object offset) {
         this.pointerOffset = offset;
+    }
+
+    public void setPointerOffset(Object pointerOffset) {
+        this.pointerOffset = pointerOffset;
+    }
+
+    public Object getPointerVariable() {
+        return pointerVariable;
+    }
+
+    public void setPointerVariable(Object pointerVariable) {
+        this.pointerVariable = pointerVariable;
+    }
+
+    public int getNodeReferenced() {
+        return nodeReferenced;
+    }
+
+    public void setNodeReferenced(int nodeReferenced) {
+        this.nodeReferenced = nodeReferenced;
     }
 }
 

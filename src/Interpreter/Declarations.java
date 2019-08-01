@@ -3,7 +3,7 @@ package Interpreter;
 import Interpreter.FileReader.Reader;
 import Interpreter.SymbolTable.*;
 
-import Interpreter.SymbolTable.Objects.PointerVariable;
+import Interpreter.SymbolTable.Types.PointerVariable;
 import Interpreter.SymbolTable.Objects.Variable;
 import Interpreter.SymbolTable.Types.ArrayType;
 import Interpreter.SymbolTable.Types.ITypes;
@@ -111,11 +111,12 @@ public class Declarations {
 
         } else if (typeName.equals("int_pointer")) {
 
-            ITypes iTypes = new PointerVariable();
+            PointerVariable iTypes = new PointerVariable();
             iTypes.setSize(4);
             iTypes.setValue(value);
             iTypes.setName("int_pointer");
             iTypes.setOffset(this.symbolTable.getStaticOffset() + iTypes.getSize());
+            iTypes.setNodeReferenced(this.symbolTable.getCurrentNode());
 
             return iTypes;
 

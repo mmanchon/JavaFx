@@ -3,7 +3,7 @@ package Interpreter;
 import Interpreter.FileReader.Reader;
 import Interpreter.SymbolTable.Node;
 import Interpreter.SymbolTable.Objects.Parameter;
-import Interpreter.SymbolTable.Objects.PointerVariable;
+import Interpreter.SymbolTable.Types.PointerVariable;
 import Interpreter.SymbolTable.SymbolTable;
 import Interpreter.SymbolTable.Types.ArrayType;
 import Interpreter.SymbolTable.Types.ITypes;
@@ -143,7 +143,7 @@ public class Headers {
 
         } else if (typeName.equals("int_pointer")) {
 
-            ITypes iTypes = new PointerVariable();
+            PointerVariable iTypes = new PointerVariable();
             iTypes.setSize(4);
             iTypes.setValue(value);
             iTypes.setName("int_pointer");
