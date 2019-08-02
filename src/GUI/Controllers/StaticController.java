@@ -20,21 +20,21 @@ import java.util.Arrays;
 public class StaticController {
 
     @FXML
-    public TableColumn<MemoryRow,String> variableName = new TableColumn<>();
+    public TableColumn<MemoryRow, String> variableName = new TableColumn<>();
     @FXML
-    public TableColumn<MemoryRow,String> variableSize= new TableColumn<>();
+    public TableColumn<MemoryRow, String> variableSize = new TableColumn<>();
     @FXML
-    public TableColumn<MemoryRow,String> variableValue = new TableColumn<>();
+    public TableColumn<MemoryRow, String> variableValue = new TableColumn<>();
     @FXML
-    public TableColumn<MemoryRow,String> variableOffset = new TableColumn<>();
+    public TableColumn<MemoryRow, String> variableOffset = new TableColumn<>();
     @FXML
-    public TableColumn<MemoryRow,String> dynamicName = new TableColumn<>();
+    public TableColumn<MemoryRow, String> dynamicName = new TableColumn<>();
     @FXML
-    public TableColumn<MemoryRow,String> dynamicSize= new TableColumn<>();
+    public TableColumn<MemoryRow, String> dynamicSize = new TableColumn<>();
     @FXML
-    public TableColumn<MemoryRow,String> dynamicValue = new TableColumn<>();
+    public TableColumn<MemoryRow, String> dynamicValue = new TableColumn<>();
     @FXML
-    public TableColumn<MemoryRow,String> dynamicOffset = new TableColumn<>();
+    public TableColumn<MemoryRow, String> dynamicOffset = new TableColumn<>();
     @FXML
     public TextArea textArea;
     @FXML
@@ -50,6 +50,7 @@ public class StaticController {
     private Editor editor;
     private TextFile currentTextfile;
     private int from = 0;
+
     /**
      * The constructor.
      * The constructor is called before the initialize() method.
@@ -58,7 +59,7 @@ public class StaticController {
     }
 
     @FXML
-    void initialize(){
+    void initialize() {
         // Initialize the person table with the two columns.
         variableName.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         variableValue.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
@@ -75,16 +76,14 @@ public class StaticController {
             @Override
             public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
                 // this will run whenever text is changed
-                System.out.println("OLD VALUE: "+ oldValue);
+                System.out.println("OLD VALUE: " + oldValue);
                 System.out.println("NEW VALUE: " + newValue);
             }
         });
 
-        textArea.setOnMouseClicked(new EventHandler<Event>()
-        {
+        textArea.setOnMouseClicked(new EventHandler<Event>() {
             @Override
-            public void handle(Event arg0)
-            {
+            public void handle(Event arg0) {
                 System.out.println("selected text:"
                         + textArea.getSelectedText());
             }
@@ -93,18 +92,20 @@ public class StaticController {
 
     }
 
-    public void setInterpreter(Interpreter interpreter){
+    public void setInterpreter(Interpreter interpreter) {
         this.interpreter = interpreter;
     }
 
-    public void setEditor(Editor editor){ this.editor = editor;}
+    public void setEditor(Editor editor) {
+        this.editor = editor;
+    }
 
     @FXML
-    public void nextLine(){
+    public void nextLine() {
 
         this.interpreter.analiseNextLine();
 
-        tableView.getItems().remove(0,tableView.getItems().size());
+        tableView.getItems().remove(0, tableView.getItems().size());
 
         tableView.setItems(interpreter.convertToMemoryData());
         tableView.refresh();
@@ -114,57 +115,57 @@ public class StaticController {
 
         this.from = 0;
         for (int i = 0; i < this.interpreter.getNumLines() - 1; i++) {
-            this.from += Arrays.asList(textArea.getText().split("\n")).get(i).length()+1;
+            this.from += Arrays.asList(textArea.getText().split("\n")).get(i).length() + 1;
         }
 
-        int to = Arrays.asList(textArea.getText().split("\n")).get(this.interpreter.getNumLines()-1).length()+1;
-        this.textArea.selectRange(from, from+to);
+        int to = Arrays.asList(textArea.getText().split("\n")).get(this.interpreter.getNumLines() - 1).length() + 1;
+        this.textArea.selectRange(from, from + to);
 
-        from = from+to;
-        this.numLines.setText("Line: "+this.interpreter.getNumLines());
+        from = from + to;
+        this.numLines.setText("Line: " + this.interpreter.getNumLines());
 
     }
 
     @FXML
-    private void onSave(){
+    private void onSave() {
         TextFile textFile = new TextFile(this.currentTextfile.getFile(), Arrays.asList(textArea.getText().split("\n")));
         editor.save(textFile);
     }
 
     @FXML
-    private void onLoad(){
-        this.tableView.getItems().remove(0,this.tableView.getItems().size());
-        this.dynamicTableView.getItems().remove(0,this.dynamicTableView.getItems().size());
+    private void onLoad() {
+        this.tableView.getItems().remove(0, this.tableView.getItems().size());
+        this.dynamicTableView.getItems().remove(0, this.dynamicTableView.getItems().size());
         this.interpreter.eraseAllData();
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File("./"));
         File file = fileChooser.showOpenDialog(null);
 
-        if(file != null){
+        if (file != null) {
             this.currentTextfile = editor.load(file.toPath());
-            if(this.currentTextfile != null){
+            if (this.currentTextfile != null) {
                 textArea.clear();
                 this.currentTextfile.getContent().forEach(line -> textArea.appendText(line + "\n"));
                 this.interpreter.setNewFile(file);
-            }else{
+            } else {
                 System.out.println("Error loading file!");
             }
         }
 
-       this.from = 0;
-    //    for(int i = 0; i < this.interpreter.getNumLines(); i++){
-    //        this.from += Arrays.asList(textArea.getText().split("\n")).get(i).length();
-     //   }
+        this.from = 0;
+        //    for(int i = 0; i < this.interpreter.getNumLines(); i++){
+        //        this.from += Arrays.asList(textArea.getText().split("\n")).get(i).length();
+        //   }
     }
 
     @FXML
-    private void onClose(){
+    private void onClose() {
         editor.close();
     }
 
     @FXML
-    private void onAbout(){
+    private void onAbout() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setHeaderText(null);
         alert.setTitle("About");
@@ -173,24 +174,24 @@ public class StaticController {
     }
 
     @FXML
-    private void restart(){
-        this.tableView.getItems().remove(0,this.tableView.getItems().size());
-        this.dynamicTableView.getItems().remove(0,this.dynamicTableView.getItems().size());
+    private void restart() {
+        this.tableView.getItems().remove(0, this.tableView.getItems().size());
+        this.dynamicTableView.getItems().remove(0, this.dynamicTableView.getItems().size());
         this.interpreter.eraseAllData();
         this.interpreter.restart();
         this.from = 0;
     }
 
-    public void addTerminalText(String text){
-        for(int i = 0; i < text.length(); i++){
-            if(text.charAt(i) == '\\') {
+    public void addTerminalText(String text) {
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == '\\') {
                 i++;
-                if(text.charAt(i) == 'n'){
+                if (text.charAt(i) == 'n') {
                     this.terminal.appendText("\n");
-                }else{
-                    this.terminal.appendText("\\"+text.charAt(i));
+                } else {
+                    this.terminal.appendText("\\" + text.charAt(i));
                 }
-            }else{
+            } else {
                 this.terminal.appendText(String.valueOf(text.charAt(i)));
             }
         }

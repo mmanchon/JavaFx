@@ -15,41 +15,41 @@ public class Headers {
     private Reader reader;
     private SymbolTable symbolTable;
     private int numLine = 0;
-    public Headers(Reader reader, SymbolTable symbolTable){
+
+    public Headers(Reader reader, SymbolTable symbolTable) {
         this.reader = reader;
         this.symbolTable = symbolTable;
     }
 
-    public Token readFunctionsHeaders(Token token, SymbolTable symbolTable){
+    public Token readFunctionsHeaders(Token token, SymbolTable symbolTable) {
         this.symbolTable = symbolTable;
         Node node = new Node();
 
 
-        while(token.getId() != Type.INT && token.getId() != Type.VOID){
+        while (token.getId() != Type.INT && token.getId() != Type.VOID) {
             token = this.reader.extractToken();
         }
 
-        if(token.getId() == Type.INT){
+        if (token.getId() == Type.INT) {
             node.setReturnType(Type.INT);
-        }else{
+        } else {
             node.setReturnType(Type.VOID);
         }
         token = this.reader.extractToken();
 
-        if(token.getId() != Type.MAIN){
+        if (token.getId() != Type.MAIN) {
             token = this.extractFunction(token, node);
         }
 
         return token;
     }
 
-    public Token readMainHeader(Token token, SymbolTable symbolTable){
+    public Token readMainHeader(Token token, SymbolTable symbolTable) {
         this.symbolTable = symbolTable;
 
-        while(token.getId() != Type.MAIN){
+        while (token.getId() != Type.MAIN) {
             token = this.reader.extractToken();
         }
-
 
 
         token = this.reader.extractToken();
@@ -64,11 +64,11 @@ public class Headers {
         return token;
     }
 
-    public int getNumLine(){
+    public int getNumLine() {
         return this.numLine;
     }
 
-    public Token extractFunction(Token token, Node node){
+    public Token extractFunction(Token token, Node node) {
 
         Parameter variable;
         Token aux;
@@ -78,18 +78,18 @@ public class Headers {
         token = this.reader.extractToken();
         token = this.reader.extractToken();
 
-        while(token.getId() != Type.CLOSE_PAR){
+        while (token.getId() != Type.CLOSE_PAR) {
 
             variable = new Parameter();
 
-            if(token.getId() == Type.INT){
+            if (token.getId() == Type.INT) {
 
                 token = this.reader.extractToken();
                 aux = token;
 
                 token = this.reader.extractToken();
 
-                if(token.getId() == Type.OPEN_BRA){
+                if (token.getId() == Type.OPEN_BRA) {
                     //TODO: Hacer arrays sin medida
                     token = this.reader.extractToken();
                     //Number
@@ -100,20 +100,20 @@ public class Headers {
                     //close bra
                     token = this.reader.extractToken();
                     variable.setReference(true);
-                }else if(aux.getId() == Type.ID_POINTER) {
+                } else if (aux.getId() == Type.ID_POINTER) {
                     variable.setName(aux.getLexema());
                     variable.setType(this.createIntArgument(token.getLexema(), "int_pointer", this.symbolTable.getStaticOffset() + 4, 4, 0, 0));
                     variable.setReference(true);
-                } else if(aux.getId() == Type.ID){
+                } else if (aux.getId() == Type.ID) {
                     variable.setName(aux.getLexema());
                     variable.setType(this.createIntArgument(token.getLexema(), "int", this.symbolTable.getStaticOffset() + 4, 4, 0, 0));
                     variable.setReference(false);
                 }
 
-               node.addVariable(variable); //hacerlo como variable
+                node.addVariable(variable); //hacerlo como variable
             }
 
-            if(token.getId() != Type.CLOSE_PAR) token = this.reader.extractToken();
+            if (token.getId() != Type.CLOSE_PAR) token = this.reader.extractToken();
         }
 
 
@@ -122,15 +122,15 @@ public class Headers {
 
         node.setNodeLine(this.reader.getNumLines());
 
-        while(token.getId() != Type.CLOSE_KEY){
+        while (token.getId() != Type.CLOSE_KEY) {
             token = this.reader.extractToken();
         }
 
         this.symbolTable.addEmptyFunctions(node);
 
-        this.symbolTable.setCurrentNode(this.symbolTable.getCurrentNode()+1);
+        this.symbolTable.setCurrentNode(this.symbolTable.getCurrentNode() + 1);
 
-        token = this.readFunctionsHeaders(token,this.symbolTable);
+        token = this.readFunctionsHeaders(token, this.symbolTable);
 
         return token;
     }

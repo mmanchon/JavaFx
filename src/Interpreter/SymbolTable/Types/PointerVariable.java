@@ -9,13 +9,21 @@ public class PointerVariable extends ArrayType {
     private Object pointerVariable;
     private int nodeReferenced;
 
-    public PointerVariable(){
+    public PointerVariable() {
         this.pointerVariable = null;
         this.nodeReferenced = -1;
     }
 
+    public PointerVariable(PointerVariable pointerVariable){
+        super(pointerVariable);
+        this.hasMemory = pointerVariable.isHasMemory();
+        this.pointerOffset = pointerVariable.getPointerOffset();
+        this.pointerVariable = pointerVariable.getPointerVariable();
+        this.nodeReferenced = pointerVariable.getNodeReferenced();
+    }
+
     public PointerVariable(String varName, String name, int size, Object value, int offset, int minPosition, int maxPosition, boolean hasMemory) {
-        super(varName,name,size,value,offset,maxPosition,minPosition);
+        super(varName, name, size, value, offset, maxPosition, minPosition);
         this.setValue(offset);
         this.hasMemory = hasMemory;
 

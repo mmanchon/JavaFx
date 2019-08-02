@@ -17,6 +17,13 @@ public class ArrayType extends ITypes {
     public ArrayType() {
     }
 
+    public ArrayType(ArrayType arrayType){
+        super(arrayType);
+        this.maxPosition = arrayType.getMaxPosition();
+        this.minPosition = arrayType.getMinPosition();
+        this.elemntsList = (Vector<Variable>) arrayType.getElemntsList().clone();
+    }
+
     public ArrayType(String varName, String name, int size, Object value, int offset, int maxPosition, int minPosition) {
         super(name, size, value, offset);
         this.maxPosition = maxPosition;

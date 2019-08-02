@@ -9,7 +9,7 @@ import javax.xml.bind.TypeConstraintException;
 import java.util.Hashtable;
 import java.util.Vector;
 
-public class Node implements Cloneable{
+public class Node implements Cloneable {
 
     private Hashtable contantsList = new Hashtable();
 
@@ -27,9 +27,10 @@ public class Node implements Cloneable{
 
     private String returnVariable;
 
-    public Node(){ }
+    public Node() {
+    }
 
-    public Node(Node node){
+    public Node(Node node) {
         this.contextsList = (Vector) node.getContextsList().clone();
         this.variablesList = (Hashtable) node.getVariablesList().clone();
         this.nodeName = node.getNodeName();
@@ -39,26 +40,28 @@ public class Node implements Cloneable{
         this.returnVariable = node.getReturnVariable();
     }
 
-    public void addConstant(Constant constant){
-        this.contantsList.put(constant.getName(),constant);
+    public void addConstant(Constant constant) {
+        this.contantsList.put(constant.getName(), constant);
     }
 
-    public void addVariable(Variable variable){
-        this.variablesList.put(variable.getName(),variable);
+    public void addVariable(Variable variable) {
+        this.variablesList.put(variable.getName(), variable);
     }
 
-    public void addContext(Context context){this.contextsList.add(context);}
+    public void addContext(Context context) {
+        this.contextsList.add(context);
+    }
 
-    public Constant getConstant(String name){
+    public Constant getConstant(String name) {
         return (Constant) this.contantsList.get(name);
     }
 
-    public Variable getVariable(String name){
+    public Variable getVariable(String name) {
         return (Variable) this.variablesList.get(name);
     }
 
 
-    public Hashtable getVariablesList(){
+    public Hashtable getVariablesList() {
         return this.variablesList;
     }
 
@@ -98,7 +101,7 @@ public class Node implements Cloneable{
         this.returnLine = returnLine;
     }
 
-   public Context getContext(int index){
+    public Context getContext(int index) {
         return (Context) this.contextsList.get(index);
     }
 
@@ -106,16 +109,16 @@ public class Node implements Cloneable{
         this.contextsList = contextsList;
     }
 
-    public Context getLastContext(){
-        return (Context) this.contextsList.get(this.contextsList.size()-1);
+    public Context getLastContext() {
+        return (Context) this.contextsList.get(this.contextsList.size() - 1);
     }
 
-    public boolean hasContext(){
+    public boolean hasContext() {
         return this.contextsList.isEmpty();
     }
 
-    public void removeLastContext(){
-        this.contextsList.remove(this.contextsList.size()-1);
+    public void removeLastContext() {
+        this.contextsList.remove(this.contextsList.size() - 1);
     }
 
     public String getReturnVariable() {
@@ -127,32 +130,31 @@ public class Node implements Cloneable{
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         String result = "\t\t<Bloc>\n";
 
-        result += "\t\t\t<Name= "+this.nodeName+" Line="+this.nodeLine+" ReturnVariable = "+this.returnVariable+">\n";
+        result += "\t\t\t<Name= " + this.nodeName + " Line=" + this.nodeLine + " ReturnVariable = " + this.returnVariable + ">\n";
         result += "\t\t\t<Constants>\n";
-        for (int i=0; i<this.contantsList.size(); i++)
-            result += ((Constant)this.contantsList.values().toArray()[i]).toString();
+        for (int i = 0; i < this.contantsList.size(); i++)
+            result += ((Constant) this.contantsList.values().toArray()[i]).toString();
         result += "\t\t\t</Constants>\n";
 
         result += "\t\t\t<Variables>\n";
-        for (int i=0; i<this.variablesList.size(); i++)
+        for (int i = 0; i < this.variablesList.size(); i++)
             result += (this.variablesList.values().toArray()[i]).toString();
         result += "\t\t\t</Variables>\n";
-
 
 
         result += "\t\t</Bloc>\n";
         return result;
     }
 
-    public void deleteAllData(){
+    public void deleteAllData() {
         this.contantsList.clear();
         this.variablesList.clear();
     }
 
-    public Object clone()throws CloneNotSupportedException{
+    public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
 }

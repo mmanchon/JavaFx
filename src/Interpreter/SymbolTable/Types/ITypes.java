@@ -13,6 +13,13 @@ public class ITypes {
         this.value = new Object();
     }
 
+    public ITypes(ITypes iTypes){
+        this.name = iTypes.getName();
+        this.size = iTypes.getSize();
+        this.offset = iTypes.getOffset();
+        this.value = iTypes.getValue();
+    }
+
     public ITypes(String name, int size, Object value, int offset){
         this.name = name;
         this.size = size;

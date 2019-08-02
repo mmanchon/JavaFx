@@ -30,8 +30,8 @@ public class SymbolTable {
         this.executionFunctions.add(this.currentNode, node);
     }
 
-    public void substituteExecutionNode(Node node){
-        this.executionFunctions.set(this.executionFunctions.indexOf(node),node);
+    public void substituteExecutionNode(Node node) {
+        this.executionFunctions.set(this.executionFunctions.indexOf(node), node);
     }
 
 
@@ -76,7 +76,7 @@ public class SymbolTable {
     }
 
     public void removeExecutionNode(int index) {
-       this.executionFunctions.remove(this.executionFunctions.get(index));
+        this.executionFunctions.remove(this.executionFunctions.get(index));
 
     }
 
@@ -85,8 +85,8 @@ public class SymbolTable {
 
         for (int i = 0; i < this.emptyFunctions.size(); i++) {
             node = (Node) this.emptyFunctions.get(i);
-            if (node.getNodeName().equals(function)){
-                return node;
+            if (node.getNodeName().equals(function)) {
+                return new Node(node);
             }
         }
 
@@ -116,12 +116,12 @@ public class SymbolTable {
     }
 
     public void deleteAllData() {
-        if(!this.emptyFunctions.isEmpty()) {
+        if (!this.emptyFunctions.isEmpty()) {
             for (int i = 0; i < this.emptyFunctions.size(); i++) {
                 ((Node) this.emptyFunctions.get(i)).deleteAllData();
             }
         }
-        if(!this.executionFunctions.isEmpty()) {
+        if (!this.executionFunctions.isEmpty()) {
             for (int i = 0; i < this.executionFunctions.size(); i++) {
                 ((Node) this.executionFunctions.get(i)).deleteAllData();
             }
@@ -140,19 +140,19 @@ public class SymbolTable {
     }
 
 
-    public void removeExecutionFunction(){
+    public void removeExecutionFunction() {
         this.executionFunctions.remove(this.currentNode);
         this.currentNode--;
     }
 
-    public Node getExecutionNode(int index){
+    public Node getExecutionNode(int index) {
         return (Node) this.executionFunctions.get(index);
 
     }
 
-    public Node getPreviousNode(){
-        if(this.currentNode > 0){
-            return (Node) this.executionFunctions.get(this.currentNode-1);
+    public Node getPreviousNode() {
+        if (this.currentNode > 0) {
+            return (Node) this.executionFunctions.get(this.currentNode - 1);
         }
 
         return null;

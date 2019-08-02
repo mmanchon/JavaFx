@@ -1,6 +1,7 @@
 void increment(int *variable){
     *variable++;
     print("HOLA");
+    increment(variable);
 }
 
 int main(){
