@@ -10,6 +10,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.text.Text;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.FileChooser;
 
@@ -152,6 +153,12 @@ public class StaticController {
                 System.out.println("Error loading file!");
             }
         }
+
+        Text text;
+
+        text = new Text("HOLA");
+        text.setStyle("-fx-text-fill: #4F8A10;");
+        this.file.appendText(text.getText());
 
         this.from = 0;
         //    for(int i = 0; i < this.interpreter.getNumLines(); i++){
