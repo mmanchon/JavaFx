@@ -15,6 +15,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.web.HTMLEditor?>
 <VBox prefHeight="559.0" prefWidth="1247.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.Controllers.StaticController">
    <children>
       <HBox prefHeight="48.0" prefWidth="1247.0" styleClass="hbox">
@@ -83,7 +84,7 @@
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                </columnResizePolicy>
              </TableView>
-            <TextArea fx:id="textArea" GridPane.rowIndex="1" />
+            <TextArea fx:id="file" GridPane.rowIndex="1" />
             <HBox maxWidth="1.7976931348623157E308">
                <children>
                   <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="60.0" prefWidth="250.0" styleClass="tableLabel" text="File" HBox.hgrow="ALWAYS" />

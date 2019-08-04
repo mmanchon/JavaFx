@@ -15,5 +15,4 @@ int main(){
 
     z = function1(a,z);
     function2();
-    function2();
 }

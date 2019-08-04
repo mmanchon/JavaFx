@@ -70,7 +70,11 @@ public class Reader implements Cloneable {
                         //token.appendCharToString((char) character);
                         this.character = this.randomAccessFile.read();
 
-                        while (detectCase((char) this.character) == ID) {
+                        while(detectCase((char) this.character) == ID_POINTER ){
+                            this.character = this.randomAccessFile.read();
+
+                        }
+                        while (detectCase((char) this.character) == ID || detectCase((char) this.character) == NUMERIC) {
                             token.appendCharToString((char) character);
                             this.character = this.randomAccessFile.read();
                         }

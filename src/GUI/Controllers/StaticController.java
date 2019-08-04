@@ -10,9 +10,9 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.web.HTMLEditor;
 import javafx.stage.FileChooser;
 
-import javax.xml.soap.Text;
 import java.io.File;
 import java.util.Arrays;
 
@@ -36,7 +36,7 @@ public class StaticController {
     @FXML
     public TableColumn<MemoryRow, String> dynamicOffset = new TableColumn<>();
     @FXML
-    public TextArea textArea;
+    public TextArea file;
     @FXML
     public TextArea terminal;
     @FXML
@@ -70,7 +70,7 @@ public class StaticController {
         dynamicSize.setCellValueFactory(cellData -> cellData.getValue().sizeProperty());
         dynamicOffset.setCellValueFactory(cellData -> cellData.getValue().offsetProperty());
 
-        textArea.setStyle("-fx-highlight-fill: lightgray; -fx-highlight-text-fill: firebrick; -fx-font-size: 12px;");
+        file.setStyle("-fx-highlight-fill: lightgray; -fx-highlight-text-fill: firebrick; -fx-font-size: 12px;");
 
         terminal.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -81,11 +81,11 @@ public class StaticController {
             }
         });
 
-        textArea.setOnMouseClicked(new EventHandler<Event>() {
+        file.setOnMouseClicked(new EventHandler<Event>() {
             @Override
             public void handle(Event arg0) {
                 System.out.println("selected text:"
-                        + textArea.getSelectedText());
+                        + file.getSelectedText());
             }
         });
 
@@ -115,11 +115,11 @@ public class StaticController {
 
         this.from = 0;
         for (int i = 0; i < this.interpreter.getNumLines() - 1; i++) {
-            this.from += Arrays.asList(textArea.getText().split("\n")).get(i).length() + 1;
+            this.from += Arrays.asList(file.getText().split("\n")).get(i).length() + 1;
         }
 
-        int to = Arrays.asList(textArea.getText().split("\n")).get(this.interpreter.getNumLines() - 1).length() + 1;
-        this.textArea.selectRange(from, from + to);
+        int to = Arrays.asList(file.getText().split("\n")).get(this.interpreter.getNumLines() - 1).length() + 1;
+        this.file.selectRange(from, from + to);
 
         from = from + to;
         this.numLines.setText("Line: " + this.interpreter.getNumLines());
@@ -128,7 +128,7 @@ public class StaticController {
 
     @FXML
     private void onSave() {
-        TextFile textFile = new TextFile(this.currentTextfile.getFile(), Arrays.asList(textArea.getText().split("\n")));
+        TextFile textFile = new TextFile(this.currentTextfile.getFile(), Arrays.asList(file.getText().split("\n")));
         editor.save(textFile);
     }
 
@@ -145,8 +145,8 @@ public class StaticController {
         if (file != null) {
             this.currentTextfile = editor.load(file.toPath());
             if (this.currentTextfile != null) {
-                textArea.clear();
-                this.currentTextfile.getContent().forEach(line -> textArea.appendText(line + "\n"));
+                this.file.clear();
+                this.currentTextfile.getContent().forEach(line -> this.file.appendText(line + "\n"));
                 this.interpreter.setNewFile(file);
             } else {
                 System.out.println("Error loading file!");

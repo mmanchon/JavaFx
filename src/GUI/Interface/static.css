@@ -1,10 +1,6 @@
-
-
 .text-area{
-    -fx-highlight-fill: red; -fx-highlight-text-fill: white; -fx-font-size: 12px;
+    -fx-highlight-text-fill: white; -fx-font-size: 12px;
 }
-
-
 
 .menu .label{
     -fx-text-fill: #F5F5DC;
@@ -20,13 +16,11 @@
 
 .hbox{
     -fx-background-color: #696969;
-
 }
 
 .tableLabel{
     -fx-background-color: #808080;
     -fx-text-fill: #F5F5DC;
-
 }
 
 #nextLine{
@@ -34,7 +28,6 @@
     -fx-background-repeat: no-repeat;
     -fx-background-position:center;
     -fx-background-color: #696969;
-
 }
 
 #restart{

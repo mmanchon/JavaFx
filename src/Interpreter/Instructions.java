@@ -13,6 +13,7 @@ import Interpreter.SymbolTable.Types.ArrayType;
 import Interpreter.SymbolTable.Types.ITypes;
 import Interpreter.Tokens.Token;
 import Interpreter.Tokens.Type;
+import com.sun.deploy.security.ValidationState;
 
 import java.util.Random;
 
@@ -95,7 +96,7 @@ public class Instructions {
             }
 
 
-            this.reader.goToLine(this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getReturnLine() + 1);
+            this.reader.goToLine(this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getReturnLine());
             this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).deleteAllData();
             this.symbolTable.removeExecutionNode(this.symbolTable.getCurrentNode());
             this.symbolTable.setCurrentNode(this.symbolTable.getCurrentNode() - 1);
@@ -170,20 +171,23 @@ public class Instructions {
         Token aux = token;
 
 
-        variable = this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema());
 
 
         token = this.reader.extractToken();
 
         if (token.getId() == Type.EQUAL) {
+            variable = this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(aux.getLexema());
 
             token = this.assignment(aux, variable);
 
         } else if (token.getId() == Type.OPEN_BRA) {
+            variable = this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(aux.getLexema());
 
             token = this.arrayAssignment(variable);
 
         } else if (token.getId() == Type.PLUS) {
+            variable = this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(aux.getLexema());
+
             token = this.reader.extractToken();
 
             if (token.getId() == Type.PLUS) {
@@ -198,7 +202,7 @@ public class Instructions {
             Node node;
 
             if ((node = this.symbolTable.isFunction(aux.getLexema())) != null) {
-                this.analyseFunction(aux, variable, new Node(node));
+                this.analyseFunction(token, null, new Node(node));
                 token = this.reader.extractToken();
             }
         }
@@ -515,10 +519,10 @@ public class Instructions {
             Node aux = new Node(node);
 
             if (aux.getVariablesList().size() != 0) this.extractArguments(token, aux);
-            aux.setReturnLine(this.reader.getNumLines());
+            aux.setReturnLine(this.reader.getNumLines()+1);
             this.reader.setNumLines(aux.getNodeLine());
             this.reader.goToLine(aux.getNodeLine());
-            this.symbolTable.setCurrentNode(this.symbolTable.getCurrentNode() + 1);
+            this.symbolTable.setCurrentNode(this.symbolTable.getCurrentNode()+1 );
 
             if (node.getReturnType() != Type.VOID) {
                 aux.setReturnVariable(token.getLexema());
@@ -531,13 +535,16 @@ public class Instructions {
     }
 
     private Token extractArguments(Token token, Node node) {
-        token = this.reader.extractToken();//variable
-
 
         Variable variable1, argument;
 
+        while (token.getId() != Type.OPEN_PAR) {
+            token = this.reader.extractToken();
+        }
+
         for (int i = 0; token.getId() != Type.CLOSE_PAR && i < node.getVariablesList().size(); i++) {
 
+            token = this.reader.extractToken();
 
             if (token.getId() == Type.AND) {
                 token = this.reader.extractToken();//gets variable name may be &
@@ -551,26 +558,20 @@ public class Instructions {
                 ((PointerVariable) argument.getType()).setPointerVariable(variable1);
 
             } else {
+
+
                 variable1 = this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema());
                 argument = new Variable((Variable) node.getVariablesList().values().toArray()[i]);
 
                 if (variable1.getType() != null && variable1.getType() instanceof PointerVariable) {
                     argument.setType(new PointerVariable((PointerVariable) variable1.getType()));
-                    argument.getType().setValue(variable1.getType().getOffset());
+                    argument.getType().setValue(((Variable)((PointerVariable)variable1.getType()).getPointerVariable()).getType().getOffset());
 
                 } else {
                     argument.getType().setValue(variable1.getType().getValue());
                 }
             }
 
-
-            if (variable1.getType() instanceof PointerVariable) {
-
-            } else if (variable1.getType() instanceof ArrayType) {
-
-            } else {
-
-            }
             argument.getType().setOffset(this.symbolTable.getStaticOffset() + 4);
             this.symbolTable.setStaticOffset(this.symbolTable.getStaticOffset() + argument.getType().getSize());
             node.addVariable(argument);
@@ -592,7 +593,7 @@ public class Instructions {
     }
 
     private void incrementReferencedValue(Variable variable, Object increment) {
-        while (((PointerVariable) variable.getType()).getPointerVariable() != null && ((Variable) ((PointerVariable) variable.getType()).getPointerVariable()).getType() instanceof PointerVariable && ((PointerVariable) variable.getType()).getNodeReferenced() != -1) {
+        while ( ((Variable)((PointerVariable)variable.getType()).getPointerVariable()).getType() instanceof PointerVariable &&  ((PointerVariable) variable.getType()).getPointerVariable() != null &&((PointerVariable) variable.getType()).getNodeReferenced() != -1) {
             variable = (Variable) ((PointerVariable) variable.getType()).getPointerVariable();
         }
         this.symbolTable.getExecutionNode(((PointerVariable) variable.getType()).getNodeReferenced()).getVariable(((Variable) ((PointerVariable) variable.getType()).getPointerVariable()).getName()).getType().setValue(Integer.parseInt(increment.toString()) + Integer.parseInt(this.symbolTable.getExecutionNode(((PointerVariable) variable.getType()).getNodeReferenced()).getVariable(((Variable) ((PointerVariable) variable.getType()).getPointerVariable()).getName()).getType().getValue().toString()));

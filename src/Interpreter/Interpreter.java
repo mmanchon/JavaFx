@@ -113,7 +113,7 @@ public class Interpreter {
 
                 } else if (this.symbolTable.getCurrentNode() > 0) {
 
-                    this.reader.goToLine(this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getReturnLine()+1);
+                    this.reader.goToLine(this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getReturnLine());
                     this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).deleteAllData();
                     this.symbolTable.removeExecutionNode(this.symbolTable.getCurrentNode());
                     this.symbolTable.setCurrentNode(this.symbolTable.getCurrentNode()-1);
@@ -121,12 +121,12 @@ public class Interpreter {
                 }
 
 
+            }else {
+                Token aux = this.token;
+                this.token = this.declarations.readDeclarations(token, symbolTable);
+                if (aux == this.token) this.token = this.instructions.readInstruction(this.token, this.symbolTable);
+
             }
-            Token aux = this.token;
-            this.token = this.declarations.readDeclarations(token, symbolTable);
-            if(aux == this.token) this.token = this.instructions.readInstruction(this.token, this.symbolTable);
-
-
             if (!(text = this.instructions.getText()).equals("")) {
                 this.controller.addTerminalText(text);
             }
