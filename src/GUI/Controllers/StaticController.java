@@ -6,16 +6,28 @@ import GUI.Models.TextFile;
 import Interpreter.Interpreter;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.text.Text;
-import javafx.scene.web.HTMLEditor;
 import javafx.stage.FileChooser;
+import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
+import org.fxmisc.richtext.model.StyleSpans;
+import org.fxmisc.richtext.model.StyleSpansBuilder;
+import org.reactfx.Subscription;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class StaticController {
@@ -37,7 +49,7 @@ public class StaticController {
     @FXML
     public TableColumn<MemoryRow, String> dynamicOffset = new TableColumn<>();
     @FXML
-    public TextArea file;
+    public CodeArea codeArea;
     @FXML
     public TextArea terminal;
     @FXML
@@ -50,8 +62,53 @@ public class StaticController {
     private Interpreter interpreter;
     private Editor editor;
     private TextFile currentTextfile;
+    private Words words;
     private int from = 0;
+    private ExecutorService executor;
 
+    private static final String[] KEYWORDS = new String[] {
+            "int","void","main","if"
+    };
+
+    private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", KEYWORDS) + ")\\b";
+    private static final String PAREN_PATTERN = "\\(|\\)";
+    private static final String BRACE_PATTERN = "\\{|\\}";
+    private static final String BRACKET_PATTERN = "\\[|\\]";
+    private static final String SEMICOLON_PATTERN = "\\;";
+    private static final String STRING_PATTERN = "\"([^\"\\\\]|\\\\.)*\"";
+    private static final String COMMENT_PATTERN = "//[^\n]*" + "|" + "/\\*(.|\\R)*?\\*/";
+
+    private static final Pattern PATTERN = Pattern.compile(
+            "(?<KEYWORD>" + KEYWORD_PATTERN + ")"
+                    + "|(?<PAREN>" + PAREN_PATTERN + ")"
+                    + "|(?<BRACE>" + BRACE_PATTERN + ")"
+                    + "|(?<BRACKET>" + BRACKET_PATTERN + ")"
+                    + "|(?<SEMICOLON>" + SEMICOLON_PATTERN + ")"
+                    + "|(?<STRING>" + STRING_PATTERN + ")"
+                    + "|(?<COMMENT>" + COMMENT_PATTERN + ")"
+    );
+    private static final String sampleCode = String.join("\n", new String[] {
+            "package com.example;",
+            "",
+            "import java.util.*;",
+            "",
+            "public class Foo extends Bar implements Baz {",
+            "",
+            "    /*",
+            "     * multi-line comment",
+            "     */",
+            "    public static void main(String[] args) {",
+            "        // single-line comment",
+            "        for(String arg: args) {",
+            "            if(arg.length() != 0)",
+            "                System.out.println(arg);",
+            "            else",
+            "                System.err.println(\"Warning: empty string as argument\");",
+            "        }",
+            "    }",
+            "",
+            "}"
+    });
     /**
      * The constructor.
      * The constructor is called before the initialize() method.
@@ -71,7 +128,7 @@ public class StaticController {
         dynamicSize.setCellValueFactory(cellData -> cellData.getValue().sizeProperty());
         dynamicOffset.setCellValueFactory(cellData -> cellData.getValue().offsetProperty());
 
-        file.setStyle("-fx-highlight-fill: lightgray; -fx-highlight-text-fill: firebrick; -fx-font-size: 12px;");
+       // codeArea.setStyle("-fx-highlight-fill: lightgray; -fx-highlight-text-fill: firebrick; -fx-font-size: 12px;");
 
         terminal.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -82,17 +139,70 @@ public class StaticController {
             }
         });
 
-        file.setOnMouseClicked(new EventHandler<Event>() {
+        codeArea.setOnMouseClicked(new EventHandler<Event>() {
             @Override
             public void handle(Event arg0) {
                 System.out.println("selected text:"
-                        + file.getSelectedText());
+                        + codeArea.getSelectedText());
             }
         });
+        executor = Executors.newSingleThreadExecutor();
+
+        codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+        Subscription cleanupWhenDone = codeArea.multiPlainChanges()
+                .successionEnds(Duration.ofMillis(500))
+                .supplyTask(this::computeHighlightingAsync)
+                .awaitLatest(codeArea.multiPlainChanges())
+                .filterMap(t -> {
+                    if(t.isSuccess()) {
+                        return Optional.of(t.get());
+                    } else {
+                        t.getFailure().printStackTrace();
+                        return Optional.empty();
+                    }
+                })
+                .subscribe(this::applyHighlighting);
 
 
     }
 
+    private Task<StyleSpans<Collection<String>>> computeHighlightingAsync() {
+        String text = codeArea.getText();
+        Task<StyleSpans<Collection<String>>> task = new Task<StyleSpans<Collection<String>>>() {
+            @Override
+            protected StyleSpans<Collection<String>> call() throws Exception {
+                return computeHighlighting(text);
+            }
+        };
+        executor.execute(task);
+        return task;
+    }
+    private void applyHighlighting(StyleSpans<Collection<String>> highlighting) {
+        codeArea.setStyleSpans(0, highlighting);
+    }
+
+    private static StyleSpans<Collection<String>> computeHighlighting(String text) {
+        Matcher matcher = PATTERN.matcher(text);
+        int lastKwEnd = 0;
+        StyleSpansBuilder<Collection<String>> spansBuilder
+                = new StyleSpansBuilder<>();
+        while(matcher.find()) {
+            String styleClass =
+                    matcher.group("KEYWORD") != null ? "keyword" :
+                            matcher.group("PAREN") != null ? "paren" :
+                                    matcher.group("BRACE") != null ? "brace" :
+                                            matcher.group("BRACKET") != null ? "bracket" :
+                                                    matcher.group("SEMICOLON") != null ? "semicolon" :
+                                                            matcher.group("STRING") != null ? "string" :
+                                                                    matcher.group("COMMENT") != null ? "comment" :
+                                                                            null; /* never happens */ assert styleClass != null;
+            spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
+            spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
+            lastKwEnd = matcher.end();
+        }
+        spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
+        return spansBuilder.create();
+    }
     public void setInterpreter(Interpreter interpreter) {
         this.interpreter = interpreter;
     }
@@ -116,11 +226,11 @@ public class StaticController {
 
         this.from = 0;
         for (int i = 0; i < this.interpreter.getNumLines() - 1; i++) {
-            this.from += Arrays.asList(file.getText().split("\n")).get(i).length() + 1;
+            this.from += Arrays.asList(codeArea.getText().split("\n")).get(i).length() + 1;
         }
 
-        int to = Arrays.asList(file.getText().split("\n")).get(this.interpreter.getNumLines() - 1).length() + 1;
-        this.file.selectRange(from, from + to);
+        int to = Arrays.asList(codeArea.getText().split("\n")).get(this.interpreter.getNumLines() - 1).length() + 1;
+       // this.codeArea.selectRange(from, from + to);
 
         from = from + to;
         this.numLines.setText("Line: " + this.interpreter.getNumLines());
@@ -129,7 +239,7 @@ public class StaticController {
 
     @FXML
     private void onSave() {
-        TextFile textFile = new TextFile(this.currentTextfile.getFile(), Arrays.asList(file.getText().split("\n")));
+        TextFile textFile = new TextFile(this.currentTextfile.getFile(), Arrays.asList(codeArea.getText().split("\n")));
         editor.save(textFile);
     }
 
@@ -142,23 +252,17 @@ public class StaticController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File("./"));
         File file = fileChooser.showOpenDialog(null);
-
+        String code;
         if (file != null) {
             this.currentTextfile = editor.load(file.toPath());
             if (this.currentTextfile != null) {
-                this.file.clear();
-                this.currentTextfile.getContent().forEach(line -> this.file.appendText(line + "\n"));
+                this.codeArea.clear();
+                this.currentTextfile.getContent().forEach(line -> this.codeArea.appendText(line + "\n"));
                 this.interpreter.setNewFile(file);
             } else {
-                System.out.println("Error loading file!");
+                System.out.println("Error loading codeArea!");
             }
         }
-
-        Text text;
-
-        text = new Text("HOLA");
-        text.setStyle("-fx-text-fill: #4F8A10;");
-        this.file.appendText(text.getText());
 
         this.from = 0;
         //    for(int i = 0; i < this.interpreter.getNumLines(); i++){

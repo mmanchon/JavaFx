@@ -13,7 +13,7 @@ public class Editor {
         try {
             Files.write(textFile.getFile(),textFile.getContent(), StandardOpenOption.CREATE);
         } catch (IOException e) {
-            System.out.println("Unable to write to file");
+            System.out.println("Unable to write to codeArea");
             e.printStackTrace();
         }
     }

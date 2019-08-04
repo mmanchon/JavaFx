@@ -42,7 +42,7 @@ public class Reader implements Cloneable {
             this.character = this.randomAccessFile.read();
 
         } catch (FileNotFoundException e) {
-            System.out.println("Error opening file");
+            System.out.println("Error opening codeArea");
             System.out.println(e.getMessage());
         } catch (IOException e) {
             System.out.println("Error while reading character");
@@ -203,7 +203,7 @@ public class Reader implements Cloneable {
                 this.analyseWord(token);
 
             } catch (IOException e) {
-                System.out.println("Error while reading file");
+                System.out.println("Error while reading codeArea");
                 e.printStackTrace();
             }
         }while (token.getId() == Type.NULL);

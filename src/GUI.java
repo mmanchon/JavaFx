@@ -34,7 +34,7 @@ public class GUI extends Application {
      */
 
     private void initStaticMemoryLayout() throws Exception {
-        // Load root layout from fxml file.
+        // Load root layout from fxml codeArea.
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("GUI/Interface/static.fxml"));
 
@@ -51,6 +51,7 @@ public class GUI extends Application {
         this.stage.setTitle("Memory Debug");
         this.stage.setScene(scene);
         this.interpreter.setController(staticController);
+        //scene.getStylesheets().add("java-keywords.css");
 
         this.stage.show();
     }
