@@ -87,28 +87,7 @@ public class StaticController {
                     + "|(?<STRING>" + STRING_PATTERN + ")"
                     + "|(?<COMMENT>" + COMMENT_PATTERN + ")"
     );
-    private static final String sampleCode = String.join("\n", new String[] {
-            "package com.example;",
-            "",
-            "import java.util.*;",
-            "",
-            "public class Foo extends Bar implements Baz {",
-            "",
-            "    /*",
-            "     * multi-line comment",
-            "     */",
-            "    public static void main(String[] args) {",
-            "        // single-line comment",
-            "        for(String arg: args) {",
-            "            if(arg.length() != 0)",
-            "                System.out.println(arg);",
-            "            else",
-            "                System.err.println(\"Warning: empty string as argument\");",
-            "        }",
-            "    }",
-            "",
-            "}"
-    });
+    Subscription cleanupWhenDone;
     /**
      * The constructor.
      * The constructor is called before the initialize() method.
@@ -138,7 +117,7 @@ public class StaticController {
                 System.out.println("NEW VALUE: " + newValue);
             }
         });
-
+        codeArea.setStyle("-fx-background-color: #2B2B2B;");
         codeArea.setOnMouseClicked(new EventHandler<Event>() {
             @Override
             public void handle(Event arg0) {
@@ -149,8 +128,9 @@ public class StaticController {
         executor = Executors.newSingleThreadExecutor();
 
         codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
-        Subscription cleanupWhenDone = codeArea.multiPlainChanges()
-                .successionEnds(Duration.ofMillis(500))
+
+        cleanupWhenDone = codeArea.multiPlainChanges()
+                .successionEnds(Duration.ofMillis(10))
                 .supplyTask(this::computeHighlightingAsync)
                 .awaitLatest(codeArea.multiPlainChanges())
                 .filterMap(t -> {
@@ -186,8 +166,9 @@ public class StaticController {
         int lastKwEnd = 0;
         StyleSpansBuilder<Collection<String>> spansBuilder
                 = new StyleSpansBuilder<>();
+        String styleClass = "nothing";
         while(matcher.find()) {
-            String styleClass =
+            styleClass =
                     matcher.group("KEYWORD") != null ? "keyword" :
                             matcher.group("PAREN") != null ? "paren" :
                                     matcher.group("BRACE") != null ? "brace" :
@@ -196,6 +177,7 @@ public class StaticController {
                                                             matcher.group("STRING") != null ? "string" :
                                                                     matcher.group("COMMENT") != null ? "comment" :
                                                                             null; /* never happens */ assert styleClass != null;
+
             spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
             spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
             lastKwEnd = matcher.end();
@@ -203,6 +185,7 @@ public class StaticController {
         spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
         return spansBuilder.create();
     }
+
     public void setInterpreter(Interpreter interpreter) {
         this.interpreter = interpreter;
     }
@@ -230,9 +213,9 @@ public class StaticController {
         }
 
         int to = Arrays.asList(codeArea.getText().split("\n")).get(this.interpreter.getNumLines() - 1).length() + 1;
-       // this.codeArea.selectRange(from, from + to);
 
         from = from + to;
+
         this.numLines.setText("Line: " + this.interpreter.getNumLines());
 
     }
@@ -265,13 +248,12 @@ public class StaticController {
         }
 
         this.from = 0;
-        //    for(int i = 0; i < this.interpreter.getNumLines(); i++){
-        //        this.from += Arrays.asList(textArea.getText().split("\n")).get(i).length();
-        //   }
+
     }
 
     @FXML
     private void onClose() {
+        cleanupWhenDone.unsubscribe();
         editor.close();
     }
 
