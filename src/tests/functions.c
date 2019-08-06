@@ -1,6 +1,6 @@
-int function1 (int b, int c){
-	int a;
-    return 2;
+void function1 (int b[4]){
+    b[0]++;
+    print("Array",b[3]);
 }
 
 void function2(){
@@ -9,10 +9,12 @@ void function2(){
 }
 
 int main(){
-    int z = 0;
-    z++;
-    int a = 3;
+    int a[4];
+    int i;
 
-    z = function1(a,z);
-    function2();
+    for(i = 0; i < 4; i++){
+        a[i] = i;
+    }
+
+    function1(a);
 }

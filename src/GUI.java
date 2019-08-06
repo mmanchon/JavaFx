@@ -2,6 +2,7 @@ import GUI.Controllers.StaticController;
 import GUI.Models.Editor;
 import Interpreter.Interpreter;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -52,7 +53,10 @@ public class GUI extends Application {
         this.stage.setScene(scene);
         this.interpreter.setController(staticController);
         //scene.getStylesheets().add("java-keywords.css");
-
+        stage.setOnHidden(e -> {
+            staticController.shutdown();
+            Platform.exit();
+        });
         this.stage.show();
     }
 

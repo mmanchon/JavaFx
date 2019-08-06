@@ -17,6 +17,7 @@ public enum Type {
     FREE,
     CALLOC,
     REALLOC,
+    SIZEOF,
 
     //Arthmetic symbols and others
     EQUAL,

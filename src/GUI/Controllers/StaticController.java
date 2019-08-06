@@ -128,7 +128,6 @@ public class StaticController {
         executor = Executors.newSingleThreadExecutor();
 
         codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
-
         cleanupWhenDone = codeArea.multiPlainChanges()
                 .successionEnds(Duration.ofMillis(10))
                 .supplyTask(this::computeHighlightingAsync)
@@ -273,6 +272,10 @@ public class StaticController {
         this.interpreter.eraseAllData();
         this.interpreter.restart();
         this.from = 0;
+    }
+
+    public void shutdown() {
+        cleanupWhenDone.unsubscribe();
     }
 
     public void addTerminalText(String text) {

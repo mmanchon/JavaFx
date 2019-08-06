@@ -27,6 +27,7 @@ public class Dictionary {
         this.dictionary.put("free",Type.FREE);
         this.dictionary.put("calloc",Type.CALLOC);
         this.dictionary.put("realloc",Type.REALLOC);
+        this.dictionary.put("sizeof",Type.SIZEOF);
 
         //Arithmetic operands
         this.dictionary.put("=",Type.EQUAL);

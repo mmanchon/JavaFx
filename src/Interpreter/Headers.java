@@ -93,13 +93,13 @@ public class Headers {
                     //TODO: Hacer arrays sin medida
                     token = this.reader.extractToken();
                     //Number
-
+                    variable.setName(aux.getLexema());
                     variable.setType(this.createIntArgument(variable.getName(), "int_array", this.symbolTable.getStaticOffset(), 4, 0, new Integer(token.getLexema())));
+                    variable.setReference(true);
 
                     token = this.reader.extractToken();
                     //close bra
                     token = this.reader.extractToken();
-                    variable.setReference(true);
                 } else if (aux.getId() == Type.ID_POINTER) {
                     variable.setName(aux.getLexema());
                     variable.setType(this.createIntArgument(token.getLexema(), "int_pointer", this.symbolTable.getStaticOffset() + 4, 4, 0, 0));

@@ -14,6 +14,7 @@ import Interpreter.SymbolTable.Types.ITypes;
 import Interpreter.Tokens.Token;
 import Interpreter.Tokens.Type;
 import com.sun.deploy.security.ValidationState;
+import com.sun.xml.internal.ws.util.StringUtils;
 
 import java.util.Random;
 
@@ -171,8 +172,6 @@ public class Instructions {
         Token aux = token;
 
 
-
-
         token = this.reader.extractToken();
 
         if (token.getId() == Type.EQUAL) {
@@ -232,13 +231,22 @@ public class Instructions {
             iTypes.setValue((Integer.parseInt(iTypes.getValue().toString()) + 1));
             variable.setType(iTypes);
 */
-            this.incrementReferencedValue(variable, 1); //Funcion para cambiar el valor de referencia
+            this.incrementReferencedValue(variable, 1, 0); //Funcion para cambiar el valor de referencia
 
         }
 
 
         this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).addVariable(variable);
 
+    }
+
+    private void incrementArrayValue(Variable variable, int index, int increment) {
+        if (variable.getType() instanceof PointerVariable) {
+            this.incrementReferencedValue(variable, increment, index);
+        } else if (variable.getType() instanceof ArrayType) {
+            ((ArrayType) variable.getType()).setElement(index, Integer.valueOf(((ArrayType) variable.getType()).getElement(index).getType().getValue().toString()) + increment);
+            this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).addVariable(variable);
+        }
     }
 
     private Token assignment(Token nameVariable, Variable variable) {
@@ -258,9 +266,27 @@ public class Instructions {
                     this.changeReferencedValue(variable, token.getLexema()); //Funcion para cambiar el valor de referencia
                 }
             }
-        } else if (token.getId() == Type.MALLOC) {
+        } else if (token.getId() == Type.OPEN_PAR) {
 
-            token = this.askMemory(token, variable);
+            token = this.reader.extractToken();
+            //TODO: Check same type variables
+            if (token.getId() == Type.INT) {
+
+                Token aux = token;
+                token = this.reader.extractToken();
+
+                if (token.getId() == Type.ID_POINTER) {
+                    token = this.reader.extractToken();
+                }
+
+            }
+
+            token = this.reader.extractToken();
+
+            if (token.getId() == Type.MALLOC) {
+                token = this.askMemory(token, variable);
+            }
+
             this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).addVariable(variable);
 
         } else if (token.getId() == Type.AND) {
@@ -302,16 +328,89 @@ public class Instructions {
 
     private Token askMemory(Token token, Variable variable) {
         PointerVariable pointerVariable;
+        int numMemory = 0;
 
-        while (token.getId() != Type.INT_CNST) {
+        token = this.reader.extractToken();
+
+        if (token.getId() == Type.OPEN_PAR) {
+            token = this.reader.extractToken();
+
+            if (token.getId() == Type.SIZEOF) {
+                numMemory = 1;
+
+                token = this.reader.extractToken();
+                if (token.getId() == Type.OPEN_PAR) {
+                    token = this.reader.extractToken();
+
+                    if (token.getId() == Type.INT) {
+                        token = this.reader.extractToken();
+
+                        if (token.getId() == Type.ID_POINTER) {
+                            token = this.reader.extractToken();
+                            while (token.getId() != Type.CLOSE_PAR) {
+                                token = this.reader.extractToken();
+                            }
+                        } else if (token.getId() == Type.CLOSE_PAR) {
+                            token = this.reader.extractToken();
+                        }
+                    }
+                }
+            }
+        }
+
+        while (token.getId() != Type.INT_CNST && token.getId() != Type.CLOSE_PAR && token.getId() != Type.ID && token.getId() != Type.ID_POINTER) {
             token = this.reader.extractToken();
 
         }
 
-        pointerVariable = new PointerVariable(variable.getName(), "int_pointer", variable.getType().getSize(), (new Random()).nextInt(10000000), this.symbolTable.getDynamicOffset(), 0, new Integer(token.getLexema()), true);
+        if (this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema()) == null) {
+            try {
+                Integer.parseInt(token.getLexema());
+                token.setId(Type.INT_CNST);
+            } catch (NumberFormatException | NullPointerException nfe) {
+                token = this.reader.extractToken();
+            }
+        }
+
+        if (token.getId() == Type.INT_CNST) {
+            numMemory = new Integer(token.getLexema());
+        } else if (token.getId() == Type.ID) {
+            if (this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema()).getType() instanceof ArrayType) {
+                Token aux = token;
+                token = this.reader.extractToken();
+                if (token.getId() == Type.OPEN_BRA) {
+                    token = this.reader.extractToken();
+                    int index;
+
+                    if (token.getId() == Type.ID) {
+
+                        index = Integer.valueOf(this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema()).getType().getValue().toString());
+
+                    } else {
+                        index = Integer.valueOf(token.getLexema());
+                    }
+
+                    numMemory = Integer.valueOf(((ArrayType) this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(aux.getLexema()).getType()).getElement(index).getType().getValue().toString());
+                }
+                token = this.reader.extractToken();
+
+            } else {
+                numMemory = Integer.valueOf(this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema()).getType().getValue().toString());
+            }
+        } else if (token.getId() == Type.ID_POINTER) {
+            if (this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema()).getType() instanceof PointerVariable) {
+                numMemory = Integer.valueOf(this.extractReferencedValue(this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema())).toString());
+
+            } else {
+                numMemory = Integer.valueOf(this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema()).getType().getValue().toString());
+
+            }
+        }
+
+        pointerVariable = new PointerVariable(variable.getName(), "int_pointer", variable.getType().getSize(), (new Random()).nextInt(10000000), this.symbolTable.getDynamicOffset(), 0, numMemory, true);
         pointerVariable.setOffset(variable.getType().getOffset());
 
-        this.symbolTable.setDynamicOffset(this.symbolTable.getDynamicOffset() + (variable.getType().getSize() * (new Integer(token.getLexema()))));
+        this.symbolTable.setDynamicOffset(this.symbolTable.getDynamicOffset() + (variable.getType().getSize() * numMemory));
 
         variable.setType(pointerVariable);
 
@@ -336,31 +435,39 @@ public class Instructions {
         }
 
 
+        token = this.reader.extractToken(); //close bracket
         token = this.reader.extractToken();
-        token = this.reader.extractToken();
-        token = this.reader.extractToken();
+        if (token.getId() == Type.EQUAL) {
+            token = this.reader.extractToken();
 
-        arrayType = (ArrayType) variable.getType();
+            arrayType = (ArrayType) variable.getType();
 
-        if (index > arrayType.getMaxPosition()) {
-            throw new AccessError("Error en acceder al array", null, index, arrayType.getMinPosition(), arrayType.getMaxPosition());
+            if (index > arrayType.getMaxPosition()) {
+                throw new AccessError("Error en acceder al array", null, index, arrayType.getMinPosition(), arrayType.getMaxPosition());
+            }
+
+
+            if (token.getId() == Type.INT_CNST) {
+                arrayType.setElement(index, token.getLexema());
+
+            } else if (token.getId() == Type.ID) {
+
+
+                arrayType.setElement(index, this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema()).getType().getValue());
+
+
+            }
+
+
+            this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).addVariable(variable);
+        } else if (token.getId() == Type.PLUS) {
+
+            token = this.reader.extractToken();
+
+            if (token.getId() == Type.PLUS) {
+                this.incrementArrayValue(variable, index, 1);
+            }
         }
-
-
-        if (token.getId() == Type.INT_CNST) {
-            arrayType.setElement(index, token.getLexema());
-
-        } else if (token.getId() == Type.ID) {
-
-
-            arrayType.setElement(index, this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema()).getType().getValue());
-
-
-        }
-
-
-        this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).addVariable(variable);
-
 
         token = this.reader.extractToken();
 
@@ -519,10 +626,10 @@ public class Instructions {
             Node aux = new Node(node);
 
             if (aux.getVariablesList().size() != 0) this.extractArguments(token, aux);
-            aux.setReturnLine(this.reader.getNumLines()+1);
+            aux.setReturnLine(this.reader.getNumLines() + 1);
             this.reader.setNumLines(aux.getNodeLine());
             this.reader.goToLine(aux.getNodeLine());
-            this.symbolTable.setCurrentNode(this.symbolTable.getCurrentNode()+1 );
+            this.symbolTable.setCurrentNode(this.symbolTable.getCurrentNode() + 1);
 
             if (node.getReturnType() != Type.VOID) {
                 aux.setReturnVariable(token.getLexema());
@@ -565,9 +672,34 @@ public class Instructions {
 
                 if (variable1.getType() != null && variable1.getType() instanceof PointerVariable) {
                     argument.setType(new PointerVariable((PointerVariable) variable1.getType()));
-                    argument.getType().setValue(((Variable)((PointerVariable)variable1.getType()).getPointerVariable()).getType().getOffset());
+                    argument.getType().setValue(((Variable) ((PointerVariable) variable1.getType()).getPointerVariable()).getType().getOffset());
 
-                } else {
+                } else if(variable1.getType()instanceof ArrayType) {
+
+                    if(argument.getType() instanceof PointerVariable){
+
+                        argument.getType().setValue(variable1.getType().getOffset());
+                        ((PointerVariable) argument.getType()).setNodeReferenced(this.symbolTable.getCurrentNode());
+                        ((PointerVariable) argument.getType()).setPointerVariable(variable1);
+
+                    }else if(argument.getType() instanceof ArrayType){
+                        //TODO Arguments list
+                        ArrayType argumentType, variableType;
+                        argumentType = ((ArrayType)argument.getType());
+                        variableType = ((ArrayType)variable1.getType());
+                        argumentType.setMaxPosition(variableType.getMaxPosition());
+                        argumentType.setMinPosition(variableType.getMinPosition());
+                        argumentType.setElemntsList(variableType.getElemntsList());
+
+                        for(int j = 0; j < argumentType.getMaxPosition(); j++){
+                            //argumentType.setElement(j,variableType.getElement(j));
+                            argumentType.getElement(j).getType().setOffset(this.symbolTable.getStaticOffset() + 4);
+                            this.symbolTable.setStaticOffset(this.symbolTable.getStaticOffset() + argument.getType().getSize());
+                        }
+
+                    }
+
+                }else{
                     argument.getType().setValue(variable1.getType().getValue());
                 }
             }
@@ -592,11 +724,34 @@ public class Instructions {
 
     }
 
-    private void incrementReferencedValue(Variable variable, Object increment) {
-        while ( ((Variable)((PointerVariable)variable.getType()).getPointerVariable()).getType() instanceof PointerVariable &&  ((PointerVariable) variable.getType()).getPointerVariable() != null &&((PointerVariable) variable.getType()).getNodeReferenced() != -1) {
+    private void incrementReferencedValue(Variable variable, Object increment, int index) {
+        while (((PointerVariable) variable.getType()).getPointerVariable() != null && ((Variable) ((PointerVariable) variable.getType()).getPointerVariable()).getType() instanceof PointerVariable && ((PointerVariable) variable.getType()).getNodeReferenced() != -1) {
             variable = (Variable) ((PointerVariable) variable.getType()).getPointerVariable();
         }
-        this.symbolTable.getExecutionNode(((PointerVariable) variable.getType()).getNodeReferenced()).getVariable(((Variable) ((PointerVariable) variable.getType()).getPointerVariable()).getName()).getType().setValue(Integer.parseInt(increment.toString()) + Integer.parseInt(this.symbolTable.getExecutionNode(((PointerVariable) variable.getType()).getNodeReferenced()).getVariable(((Variable) ((PointerVariable) variable.getType()).getPointerVariable()).getName()).getType().getValue().toString()));
+
+        if (variable.getType() instanceof PointerVariable) {
+            if(((Variable) ((PointerVariable) variable.getType()).getPointerVariable()).getType() instanceof ArrayType){
+               // variable = (Variable) ((PointerVariable) variable.getType()).getPointerVariable();
+                ((ArrayType) ((Variable) ((PointerVariable) variable.getType()).getPointerVariable()).getType()).setElement(index, Integer.valueOf(((ArrayType) ((Variable) ((PointerVariable) variable.getType()).getPointerVariable()).getType()).getElement(index).getType().getValue().toString()) + Integer.valueOf(increment.toString()));
+                this.symbolTable.getExecutionNode(((PointerVariable) variable.getType()).getNodeReferenced()).addVariable((Variable) ((PointerVariable) variable.getType()).getPointerVariable());
+            }else {
+                this.symbolTable.getExecutionNode(((PointerVariable) variable.getType()).getNodeReferenced()).getVariable(((Variable) ((PointerVariable) variable.getType()).getPointerVariable()).getName()).getType().setValue(Integer.parseInt(increment.toString()) + Integer.parseInt(this.symbolTable.getExecutionNode(((PointerVariable) variable.getType()).getNodeReferenced()).getVariable(((Variable) ((PointerVariable) variable.getType()).getPointerVariable()).getName()).getType().getValue().toString()));
+            }
+
+        } else {
+
+        }
+    }
+
+    private Object extractReferencedValue(Variable variable) {
+        while (((PointerVariable) variable.getType()).getPointerVariable() != null && ((Variable) ((PointerVariable) variable.getType()).getPointerVariable()).getType() instanceof PointerVariable && ((PointerVariable) variable.getType()).getNodeReferenced() != -1) {
+            variable = (Variable) ((PointerVariable) variable.getType()).getPointerVariable();
+        }
+
+        if (variable.getType() instanceof PointerVariable && ((PointerVariable) variable.getType()).getPointerVariable() != null) {
+            return this.symbolTable.getExecutionNode(((PointerVariable) variable.getType()).getNodeReferenced()).getVariable(((Variable) ((PointerVariable) variable.getType()).getPointerVariable()).getName()).getType().getValue();
+        }
+        return ((ArrayType) variable.getType()).getElement(Integer.valueOf(variable.getType().getValue().toString()) / 4).getType().getValue();
 
     }
 

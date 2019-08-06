@@ -72,7 +72,9 @@ public class ArrayType extends ITypes {
     }
 
     public void setElemntsList(Vector<Variable> elemntsList) {
-        this.elemntsList = elemntsList;
+        for(int i = 0; i < this.elemntsList.size(); i++){
+            this.elemntsList.get(i).getType().setValue(elemntsList.get(i).getType().getValue());
+        }
     }
 
     public Variable getElement(int index) {
