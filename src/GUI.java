@@ -5,8 +5,14 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+
+import java.beans.EventHandler;
 
 
 public class GUI extends Application {
@@ -14,7 +20,6 @@ public class GUI extends Application {
     private Stage stage;
 
     private Interpreter interpreter;
-
     @Override
     public void start(Stage primaryStage) throws Exception {
 
@@ -47,12 +52,10 @@ public class GUI extends Application {
 
         Scene scene = new Scene(rootLayout);
 
-
-       // this.stage.setMaximized(true);
         this.stage.setTitle("Memory Debug");
         this.stage.setScene(scene);
         this.interpreter.setController(staticController);
-        //scene.getStylesheets().add("java-keywords.css");
+
         stage.setOnHidden(e -> {
             staticController.shutdown();
             Platform.exit();

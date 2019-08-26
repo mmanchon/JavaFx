@@ -1,5 +1,6 @@
 package Interpreter.FileReader;
 
+import GUI.Controllers.StaticController;
 import Interpreter.Tokens.Dictionary;
 import Interpreter.Tokens.Token;
 import Interpreter.Tokens.Type;
@@ -14,6 +15,7 @@ public class Reader implements Cloneable {
     private Dictionary dictionary;
     private String fileName;
     private RandomAccessFile randomAccessFile;
+    private StaticController controller;
 
     private final char ID = 1;
     private final char ID_POINTER = 2;
@@ -27,6 +29,8 @@ public class Reader implements Cloneable {
     private final int ERROR = 11;
     private int numLines = 0;
     private int character;
+    int index = 0;
+    String text = new String();
 
     public Reader(){
         this.dictionary = new Dictionary();
@@ -40,7 +44,6 @@ public class Reader implements Cloneable {
 
             this.randomAccessFile = new RandomAccessFile(fileName,"r");
             this.character = this.randomAccessFile.read();
-
         } catch (FileNotFoundException e) {
             System.out.println("Error opening codeArea");
             System.out.println(e.getMessage());
@@ -300,5 +303,8 @@ public class Reader implements Cloneable {
 
     }
 
+    public void setController(StaticController controller){
+        this.controller = controller;
+    }
 
 }

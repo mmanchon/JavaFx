@@ -22,7 +22,7 @@
 }
 
 .paragraph-box{
-    -fx-background-color: #2B2B2B;
+    -fx-background-color: #C5C8C6;
 
 }
 
@@ -49,7 +49,7 @@
 }
 .terminal .content{
     -fx-background-color: #2B2B2B;
-    -fx-border-color: #2B2B2B;
+   -fx-border-color: #2B2B2B;
 }
 
 .text-area{
@@ -82,7 +82,7 @@
 
 
 .keyword {
-    -fx-fill: #DE935F;
+    -fx-fill: #ad5e24;
     -fx-font-weight: bold;
 }
 .semicolon {
@@ -112,9 +112,7 @@
     -fx-fill: white;
     -fx-text-fill: white;
 }
-.code-area .text {
-    -fx-fill: #C5C8C6;
-}
+
 .paragraph-box:has-caret {
-    -fx-background-color: #323232;
+    -fx-background-color: #707880;
 }

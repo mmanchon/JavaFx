@@ -1,6 +1,5 @@
 package Interpreter.SymbolTable.Contexts;
 
-import Interpreter.FileReader.Reader;
 import Interpreter.Tokens.Type;
 
 import java.util.Vector;

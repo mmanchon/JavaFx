@@ -695,6 +695,8 @@ public class Instructions {
                             //argumentType.setElement(j,variableType.getElement(j));
                             argumentType.getElement(j).getType().setOffset(this.symbolTable.getStaticOffset() + 4);
                             this.symbolTable.setStaticOffset(this.symbolTable.getStaticOffset() + argument.getType().getSize());
+                            argumentType.getElement(j).setType(new PointerVariable((PointerVariable) argumentType.getElement(j).getType()));
+                            ((PointerVariable)argumentType.getElement(j).getType()).setNodeReferenced(this.symbolTable.getCurrentNode());
                         }
 
                     }

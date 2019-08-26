@@ -11,6 +11,10 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
@@ -19,6 +23,8 @@ import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.reactfx.Subscription;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,6 +32,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,12 +69,14 @@ public class StaticController {
     private Interpreter interpreter;
     private Editor editor;
     private TextFile currentTextfile;
-    private Words words;
     private int from = 0;
     private ExecutorService executor;
 
+    final KeyCombination keyComb1 = new KeyCodeCombination(KeyCode.S,
+            KeyCombination.CONTROL_DOWN);
+
     private static final String[] KEYWORDS = new String[] {
-            "int","void","main","if"
+            "int","void","main","if","do","while","return","for","#include","#define"
     };
 
     private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", KEYWORDS) + ")\\b";
@@ -127,7 +136,36 @@ public class StaticController {
         });
         executor = Executors.newSingleThreadExecutor();
 
+        this.codeArea.setOnKeyPressed(new EventHandler<KeyEvent>() {
+
+            @Override
+            public void handle(KeyEvent event) {
+                if (keyComb1.match(event)) {
+                    System.out.println("Ctrl+R pressed");
+                    if(getCurrentTextfile() != null) {
+                        onSave();
+                    }else{
+                        FileChooser fileChooser = new FileChooser();
+
+                        //Set extension filter
+                        FileChooser.ExtensionFilter extFilter =
+                                new FileChooser.ExtensionFilter("C files (*.c)", "*.c");
+                        fileChooser.getExtensionFilters().add(extFilter);
+
+                        //Show save file dialog
+                        File file = fileChooser.showSaveDialog(null);
+
+                        if(file != null){
+                            SaveFile(codeArea.getText(), file);
+                        }
+                        load(file);
+                    }
+                }
+            }
+        });
+
         codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+
         cleanupWhenDone = codeArea.multiPlainChanges()
                 .successionEnds(Duration.ofMillis(10))
                 .supplyTask(this::computeHighlightingAsync)
@@ -156,6 +194,7 @@ public class StaticController {
         executor.execute(task);
         return task;
     }
+
     private void applyHighlighting(StyleSpans<Collection<String>> highlighting) {
         codeArea.setStyleSpans(0, highlighting);
     }
@@ -195,28 +234,28 @@ public class StaticController {
 
     @FXML
     public void nextLine() {
+        if(getCurrentTextfile() != null) {
+            this.interpreter.analiseNextLine();
 
-        this.interpreter.analiseNextLine();
+            tableView.getItems().remove(0, tableView.getItems().size());
 
-        tableView.getItems().remove(0, tableView.getItems().size());
+            tableView.setItems(interpreter.convertToMemoryData());
+            tableView.refresh();
 
-        tableView.setItems(interpreter.convertToMemoryData());
-        tableView.refresh();
+            dynamicTableView.setItems(interpreter.getDynamicMemoryRows());
+            dynamicTableView.refresh();
 
-        dynamicTableView.setItems(interpreter.getDynamicMemoryRows());
-        dynamicTableView.refresh();
+            this.from = 0;
+            for (int i = 0; i < this.interpreter.getNumLines() - 1; i++) {
+                this.from += Arrays.asList(codeArea.getText().split("\n")).get(i).length() + 1;
+            }
 
-        this.from = 0;
-        for (int i = 0; i < this.interpreter.getNumLines() - 1; i++) {
-            this.from += Arrays.asList(codeArea.getText().split("\n")).get(i).length() + 1;
+            int to = Arrays.asList(codeArea.getText().split("\n")).get(this.interpreter.getNumLines() - 1).length() + 1;
+
+            from = from + to;
+
+            this.numLines.setText("Line: " + this.interpreter.getNumLines());
         }
-
-        int to = Arrays.asList(codeArea.getText().split("\n")).get(this.interpreter.getNumLines() - 1).length() + 1;
-
-        from = from + to;
-
-        this.numLines.setText("Line: " + this.interpreter.getNumLines());
-
     }
 
     @FXML
@@ -235,6 +274,12 @@ public class StaticController {
         fileChooser.setInitialDirectory(new File("./"));
         File file = fileChooser.showOpenDialog(null);
         String code;
+        load(file);
+        this.from = 0;
+
+    }
+
+    private void load(File file){
         if (file != null) {
             this.currentTextfile = editor.load(file.toPath());
             if (this.currentTextfile != null) {
@@ -245,9 +290,6 @@ public class StaticController {
                 System.out.println("Error loading codeArea!");
             }
         }
-
-        this.from = 0;
-
     }
 
     @FXML
@@ -293,5 +335,32 @@ public class StaticController {
         }
 
     }
+
+
+    public CodeArea getCodeArea() {
+        return codeArea;
+    }
+
+    public TextFile getCurrentTextfile() {
+        return currentTextfile;
+    }
+
+    public void setCurrentTextfile(TextFile currentTextfile) {
+        this.currentTextfile = currentTextfile;
+    }
+
+    private void SaveFile(String content, File file){
+        try {
+            FileWriter fileWriter;
+
+            fileWriter = new FileWriter(file);
+            fileWriter.write(content);
+            fileWriter.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+    }
+
 
 }

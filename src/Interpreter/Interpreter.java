@@ -222,6 +222,8 @@ public class Interpreter {
 
     public void setController(StaticController controller) {
         this.controller = controller;
+        this.reader.setController(controller);
+        //this.controller.setReader();
     }
 
     private void openPopUpView(BasicError basicError) {
