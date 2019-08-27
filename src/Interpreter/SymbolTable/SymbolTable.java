@@ -1,7 +1,6 @@
 package Interpreter.SymbolTable;
 
 import java.util.ArrayList;
-import java.util.Vector;
 
 public class SymbolTable {
 
@@ -12,7 +11,6 @@ public class SymbolTable {
     private ArrayList emptyFunctions;
 
     private ArrayList executionFunctions;
-
 
     public SymbolTable() {
         this.currentNode = 0;
@@ -120,12 +118,17 @@ public class SymbolTable {
             for (int i = 0; i < this.emptyFunctions.size(); i++) {
                 ((Node) this.emptyFunctions.get(i)).deleteAllData();
             }
+            this.emptyFunctions.clear();
         }
         if (!this.executionFunctions.isEmpty()) {
             for (int i = 0; i < this.executionFunctions.size(); i++) {
                 ((Node) this.executionFunctions.get(i)).deleteAllData();
             }
+            this.executionFunctions.clear();
         }
+        this.currentNode = 0;
+        this.dynamicOffset = 0;
+        this.staticOffset = 0;
         this.currentNode = 0;
 
     }

@@ -1,7 +1,7 @@
 package Interpreter;
 
-import GUI.Controllers.PopUpController;
-import GUI.Controllers.StaticController;
+import GUI.Controllers.ErrorController;
+import GUI.Controllers.Controller;
 import Interpreter.Errors.BasicError;
 import Interpreter.FileReader.Reader;
 import GUI.Models.MemoryRow;
@@ -35,10 +35,9 @@ public class Interpreter {
     private SymbolTable symbolTable = new SymbolTable();
     private ObservableList<MemoryRow> memoryRows = FXCollections.observableArrayList();
     private ObservableList<MemoryRow> dynamicMemoryRows = FXCollections.observableArrayList();
-    private StaticController controller;
+    private Controller controller;
 
     private Token token = new Token();
-
 
     public Interpreter() {
         this.reader = new Reader();
@@ -210,17 +209,19 @@ public class Interpreter {
 
     public void restart() {
         this.reader.restart();
+        token = this.headers.readFunctionsHeaders(token, symbolTable);
+        token = this.headers.readMainHeader(token, symbolTable);
     }
 
     public int getNumLines() {
         return this.reader.getNumLines();
     }
 
-    public StaticController getController() {
+    public Controller getController() {
         return controller;
     }
 
-    public void setController(StaticController controller) {
+    public void setController(Controller controller) {
         this.controller = controller;
         this.reader.setController(controller);
         //this.controller.setReader();
@@ -231,16 +232,16 @@ public class Interpreter {
         try {
 
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("../GUI/Interface/popup.fxml"));
+            loader.setLocation(getClass().getResource("../GUI/Interface/error.fxml"));
 
             root = loader.load();
 
-            PopUpController popUpController = (PopUpController) loader.getController();
-            popUpController.setError(basicError);
+            ErrorController errorController = (ErrorController) loader.getController();
+            errorController.setError(basicError);
 
             Stage stage = new Stage();
 
-            stage.setTitle("Ups!");
+            stage.setTitle("Error");
             stage.setScene(new Scene(root));
 
             stage.show();
@@ -250,4 +251,11 @@ public class Interpreter {
         }
     }
 
+    public void setValue(String text){
+        this.instructions.setValue(text);
+    }
+
+    public boolean needValue(){
+        return this.instructions.isNewValue();
+    }
 }

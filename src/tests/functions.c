@@ -1,4 +1,4 @@
-void function1 (int b[4]){
+void function1 (int *b){
     b[0]++;
     print("Array",b[3]);
 }

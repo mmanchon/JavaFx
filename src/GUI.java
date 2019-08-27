@@ -1,18 +1,12 @@
-import GUI.Controllers.StaticController;
+import GUI.Controllers.Controller;
 import GUI.Models.Editor;
 import Interpreter.Interpreter;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-
-import java.beans.EventHandler;
 
 
 public class GUI extends Application {
@@ -42,22 +36,22 @@ public class GUI extends Application {
     private void initStaticMemoryLayout() throws Exception {
         // Load root layout from fxml codeArea.
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("GUI/Interface/static.fxml"));
+        loader.setLocation(getClass().getResource("GUI/Interface/main.fxml"));
 
         Pane rootLayout = loader.load();
 
-        StaticController staticController = loader.getController();
-        staticController.setInterpreter(this.interpreter);
-        staticController.setEditor(new Editor());
+        Controller controller = loader.getController();
+        controller.setInterpreter(this.interpreter);
+        controller.setEditor(new Editor());
 
         Scene scene = new Scene(rootLayout);
 
         this.stage.setTitle("Memory Debug");
         this.stage.setScene(scene);
-        this.interpreter.setController(staticController);
+        this.interpreter.setController(controller);
 
         stage.setOnHidden(e -> {
-            staticController.shutdown();
+            controller.shutdown();
             Platform.exit();
         });
         this.stage.show();

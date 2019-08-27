@@ -1,21 +1,18 @@
 package Interpreter.FileReader;
 
-import GUI.Controllers.StaticController;
+import GUI.Controllers.Controller;
 import Interpreter.Tokens.Dictionary;
 import Interpreter.Tokens.Token;
 import Interpreter.Tokens.Type;
 
 import java.io.*;
-import java.nio.charset.Charset;
-
-import static com.sun.org.apache.xalan.internal.xsltc.compiler.sym.error;
 
 public class Reader implements Cloneable {
 
     private Dictionary dictionary;
     private String fileName;
     private RandomAccessFile randomAccessFile;
-    private StaticController controller;
+    private Controller controller;
 
     private final char ID = 1;
     private final char ID_POINTER = 2;
@@ -303,7 +300,7 @@ public class Reader implements Cloneable {
 
     }
 
-    public void setController(StaticController controller){
+    public void setController(Controller controller){
         this.controller = controller;
     }
 

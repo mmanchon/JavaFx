@@ -4,18 +4,28 @@ import GUI.Models.Editor;
 import GUI.Models.MemoryRow;
 import GUI.Models.TextFile;
 import Interpreter.Interpreter;
+import Interpreter.Theory.BasicTheory;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.model.StyleSpans;
@@ -32,12 +42,13 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.IntFunction;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class StaticController {
+public class Controller {
 
     @FXML
     public TableColumn<MemoryRow, String> variableName = new TableColumn<>();
@@ -76,7 +87,7 @@ public class StaticController {
             KeyCombination.CONTROL_DOWN);
 
     private static final String[] KEYWORDS = new String[] {
-            "int","void","main","if","do","while","return","for","#include","#define"
+            "int","void","main","if","do","while","return","for","include","define"
     };
 
     private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", KEYWORDS) + ")\\b";
@@ -97,11 +108,13 @@ public class StaticController {
                     + "|(?<COMMENT>" + COMMENT_PATTERN + ")"
     );
     Subscription cleanupWhenDone;
+
+    private String input = "";
     /**
      * The constructor.
      * The constructor is called before the initialize() method.
      */
-    public StaticController() {
+    public Controller() {
     }
 
     @FXML
@@ -122,16 +135,34 @@ public class StaticController {
             @Override
             public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
                 // this will run whenever text is changed
-                System.out.println("OLD VALUE: " + oldValue);
-                System.out.println("NEW VALUE: " + newValue);
+                //System.out.println("OLD VALUE: " + oldValue);
+                //System.out.println("NEW VALUE: " + newValue);
+
+                if(newValue.toCharArray()[newValue.length()-1] == '\n' && interpreter.needValue()){
+                    interpreter.setValue(input);
+                    input = "";
+                    //nextLine();
+                }else{
+                    if(interpreter.needValue()){
+                        input = input + newValue.substring(newValue.length()-1);
+                    }
+                }
             }
         });
+
         codeArea.setStyle("-fx-background-color: #2B2B2B;");
         codeArea.setOnMouseClicked(new EventHandler<Event>() {
             @Override
             public void handle(Event arg0) {
-                System.out.println("selected text:"
-                        + codeArea.getSelectedText());
+              //  System.out.println("selected text:"
+              //          + codeArea.getSelectedText());
+
+                if(!codeArea.getSelectedText().equals("")){
+                    detectInstruction(codeArea.getSelectedText());
+                }
+
+                codeArea.setParagraphGraphicFactory(null);
+                codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
             }
         });
         executor = Executors.newSingleThreadExecutor();
@@ -181,6 +212,79 @@ public class StaticController {
                 .subscribe(this::applyHighlighting);
 
 
+    }
+
+
+    private void detectInstruction(String text){
+        if(Arrays.asList(KEYWORDS).contains(text)){// "int","void","main","if","do","while","return","for","include","define"
+
+            Parent root;
+            BasicTheory basicTheory;
+            switch (text){
+                case "if":
+                    basicTheory = new BasicTheory("Teoria del if",null);
+                    break;
+                case "int":
+                    basicTheory = new BasicTheory("Teoria del int",null);
+                    break;
+                case "void":
+                    basicTheory = new BasicTheory("Teoria del void",null);
+
+                    break;
+                case "main":
+                    basicTheory = new BasicTheory("Teoria del main",null);
+
+                    break;
+                case "do":
+                    basicTheory = new BasicTheory("Teoria del do",null);
+
+                    break;
+                case "while":
+                    basicTheory = new BasicTheory("Teoria del while",null);
+
+                    break;
+                case "return":
+                    basicTheory = new BasicTheory("Teoria del return",null);
+
+                    break;
+                case "for":
+                    basicTheory = new BasicTheory("Teoria del for",null);
+
+                    break;
+                case "include":
+                    basicTheory = new BasicTheory("Teoria del include",null);
+
+                    break;
+                case "define":
+                    basicTheory = new BasicTheory("Teoria del define",null);
+
+                    break;
+                    default:
+                        basicTheory = new BasicTheory("",null);
+            }
+            try {
+
+                FXMLLoader loader = new FXMLLoader();
+                loader.setLocation(getClass().getResource("../Interface/teoria.fxml"));
+
+                root = loader.load();
+
+                Teoria teoria = (Teoria) loader.getController();
+                teoria.setTheory(basicTheory);
+
+                Stage stage = new Stage();
+                stage.setResizable(false);
+                stage.setTitle("Theory about C");
+                stage.setScene(new Scene(root));
+                //stage.initStyle(StageStyle.UNDECORATED);
+                stage.show();
+                // Hide this current window (if this is what you want)
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+        }
     }
 
     private Task<StyleSpans<Collection<String>>> computeHighlightingAsync() {
@@ -234,10 +338,11 @@ public class StaticController {
 
     @FXML
     public void nextLine() {
-        if(getCurrentTextfile() != null) {
+        if(getCurrentTextfile() != null && !this.interpreter.needValue()) {
             this.interpreter.analiseNextLine();
 
             tableView.getItems().remove(0, tableView.getItems().size());
+            dynamicTableView.getItems().remove(0, dynamicTableView.getItems().size());
 
             tableView.setItems(interpreter.convertToMemoryData());
             tableView.refresh();
@@ -253,6 +358,20 @@ public class StaticController {
             int to = Arrays.asList(codeArea.getText().split("\n")).get(this.interpreter.getNumLines() - 1).length() + 1;
 
             from = from + to;
+
+            IntFunction<Node> numberFactory = LineNumberFactory.get(codeArea);
+            IntFunction<Node> arrowFactory = new ArrowFactory(codeArea.currentParagraphProperty());
+            IntFunction<Node> graphicFactory = line -> {
+                HBox hbox = new HBox(
+                        numberFactory.apply(line),
+                        arrowFactory.apply(line));
+                hbox.setAlignment(Pos.CENTER_LEFT);
+                return hbox;
+            };
+            codeArea.setParagraphGraphicFactory(graphicFactory);
+          //  codeArea.replaceText("The green arrow will only be on the line where the caret appears.\n\nTry it.");
+            codeArea.moveTo(this.interpreter.getNumLines()-1, 0);
+
 
             this.numLines.setText("Line: " + this.interpreter.getNumLines());
         }
@@ -316,6 +435,11 @@ public class StaticController {
         this.from = 0;
     }
 
+    @FXML
+    private void theoryMenuItem(ActionEvent e){
+        detectInstruction(((MenuItem)e.getSource()).getText());
+    }
+
     public void shutdown() {
         cleanupWhenDone.unsubscribe();
     }
@@ -361,6 +485,7 @@ public class StaticController {
         }
 
     }
+
 
 
 }

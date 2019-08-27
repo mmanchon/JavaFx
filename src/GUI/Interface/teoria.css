@@ -1,0 +1,26 @@
+#explicacion .content{
+    -fx-text-fill:#C5C8C6 ;
+    -fx-background-color: #2B2B2B;
+}
+
+.vbox{
+    -fx-background-color: #44474A;
+    -fx-border-color: #44474A;
+}
+
+.button{
+    -fx-background-color: #707880;
+    -fx-text-fill: #C5C8C6;
+}
+.label{
+    -fx-background-color: #44474A;
+    -fx-text-fill: #C5C8C6;
+}
+
+.hbox{
+    -fx-background-color: #44474A;
+    -fx-border-color: #44474A;
+}
+.text-area{
+    -fx-text-fill:#C5C8C6 ;
+}

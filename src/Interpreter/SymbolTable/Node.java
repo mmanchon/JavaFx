@@ -152,6 +152,7 @@ public class Node implements Cloneable {
     public void deleteAllData() {
         this.contantsList.clear();
         this.variablesList.clear();
+        this.contextsList.clear();
     }
 
     public Object clone() throws CloneNotSupportedException {

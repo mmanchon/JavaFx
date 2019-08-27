@@ -23,6 +23,8 @@ public class Instructions {
     private Reader reader;
     private SymbolTable symbolTable;
     private String text;
+    private Variable variableToRead;
+    private boolean newValue = false;
 
     public Instructions(Reader reader, SymbolTable symbolTable) {
         this.reader = reader;
@@ -130,7 +132,16 @@ public class Instructions {
             token = this.reader.extractToken();
             //TODO: Detect if variable exists
 
-            Variable variable = this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema());
+            this.variableToRead = this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).getVariable(token.getLexema());
+            this.newValue = true;
+          //  while(!this.symbolTable.isNewValue());
+         /*  Thread thread = new Thread(){
+                public void run(){
+                    while(!this.symbolTable.isNewValue());
+                }
+            };*/
+
+         //   thread.start();
 
             token = this.reader.extractToken();
             token = this.reader.extractToken();
@@ -674,34 +685,34 @@ public class Instructions {
                     argument.setType(new PointerVariable((PointerVariable) variable1.getType()));
                     argument.getType().setValue(((Variable) ((PointerVariable) variable1.getType()).getPointerVariable()).getType().getOffset());
 
-                } else if(variable1.getType()instanceof ArrayType) {
+                } else if (variable1.getType() instanceof ArrayType) {
 
-                    if(argument.getType() instanceof PointerVariable){
+                    if (argument.getType() instanceof PointerVariable) {
 
                         argument.getType().setValue(variable1.getType().getOffset());
                         ((PointerVariable) argument.getType()).setNodeReferenced(this.symbolTable.getCurrentNode());
                         ((PointerVariable) argument.getType()).setPointerVariable(variable1);
 
-                    }else if(argument.getType() instanceof ArrayType){
+                    } else if (argument.getType() instanceof ArrayType) {
                         //TODO Arguments list
                         ArrayType argumentType, variableType;
-                        argumentType = ((ArrayType)argument.getType());
-                        variableType = ((ArrayType)variable1.getType());
+                        argumentType = ((ArrayType) argument.getType());
+                        variableType = ((ArrayType) variable1.getType());
                         argumentType.setMaxPosition(variableType.getMaxPosition());
                         argumentType.setMinPosition(variableType.getMinPosition());
                         argumentType.setElemntsList(variableType.getElemntsList());
 
-                        for(int j = 0; j < argumentType.getMaxPosition(); j++){
+                        for (int j = 0; j < argumentType.getMaxPosition(); j++) {
                             //argumentType.setElement(j,variableType.getElement(j));
                             argumentType.getElement(j).getType().setOffset(this.symbolTable.getStaticOffset() + 4);
                             this.symbolTable.setStaticOffset(this.symbolTable.getStaticOffset() + argument.getType().getSize());
                             argumentType.getElement(j).setType(new PointerVariable((PointerVariable) argumentType.getElement(j).getType()));
-                            ((PointerVariable)argumentType.getElement(j).getType()).setNodeReferenced(this.symbolTable.getCurrentNode());
+                            ((PointerVariable) argumentType.getElement(j).getType()).setNodeReferenced(this.symbolTable.getCurrentNode());
                         }
 
                     }
 
-                }else{
+                } else {
                     argument.getType().setValue(variable1.getType().getValue());
                 }
             }
@@ -732,11 +743,11 @@ public class Instructions {
         }
 
         if (variable.getType() instanceof PointerVariable) {
-            if(((Variable) ((PointerVariable) variable.getType()).getPointerVariable()).getType() instanceof ArrayType){
-               // variable = (Variable) ((PointerVariable) variable.getType()).getPointerVariable();
+            if (((Variable) ((PointerVariable) variable.getType()).getPointerVariable()).getType() instanceof ArrayType) {
+                // variable = (Variable) ((PointerVariable) variable.getType()).getPointerVariable();
                 ((ArrayType) ((Variable) ((PointerVariable) variable.getType()).getPointerVariable()).getType()).setElement(index, Integer.valueOf(((ArrayType) ((Variable) ((PointerVariable) variable.getType()).getPointerVariable()).getType()).getElement(index).getType().getValue().toString()) + Integer.valueOf(increment.toString()));
                 this.symbolTable.getExecutionNode(((PointerVariable) variable.getType()).getNodeReferenced()).addVariable((Variable) ((PointerVariable) variable.getType()).getPointerVariable());
-            }else {
+            } else {
                 this.symbolTable.getExecutionNode(((PointerVariable) variable.getType()).getNodeReferenced()).getVariable(((Variable) ((PointerVariable) variable.getType()).getPointerVariable()).getName()).getType().setValue(Integer.parseInt(increment.toString()) + Integer.parseInt(this.symbolTable.getExecutionNode(((PointerVariable) variable.getType()).getNodeReferenced()).getVariable(((Variable) ((PointerVariable) variable.getType()).getPointerVariable()).getName()).getType().getValue().toString()));
             }
 
@@ -763,7 +774,18 @@ public class Instructions {
         return aux;
     }
 
-    public void setText(String text) {
-        this.text = text;
+
+    public boolean isNewValue() {
+        return newValue;
+    }
+
+    public void setNewValue(boolean newValue) {
+        this.newValue = newValue;
+    }
+
+    public void setValue(Object object){
+        this.variableToRead.getType().setValue(object);
+        this.symbolTable.getExecutionNode(this.symbolTable.getCurrentNode()).addVariable(this.variableToRead);
+        this.newValue = false;
     }
 }

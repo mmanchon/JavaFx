@@ -7,14 +7,14 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
-public class PopUpController {
+public class ErrorController {
 
     @FXML
     private Button accept;
     @FXML
     private Button seeMore;
     @FXML
-    private TextArea textArea;
+    private TextArea explicacion;
     @FXML
     private ImageView image;
 
@@ -22,7 +22,7 @@ public class PopUpController {
      * The constructor.
      * The constructor is called before the initialize() method.
      */
-    public PopUpController() {
+    public ErrorController() {
 
     }
 
@@ -30,7 +30,7 @@ public class PopUpController {
     void initialize(){}
 
     public void setError(BasicError basicError){
-        this.textArea.setText(basicError.getMessage());
+        this.explicacion.setText(basicError.getMessage());
         this.image.setImage(basicError.getImege());
     }
 

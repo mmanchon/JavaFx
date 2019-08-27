@@ -101,7 +101,7 @@
     -fx-font-weight: bold;
 }
 .string {
-    -fx-fill: #F0C674;
+    -fx-fill: #90265a;
 }
 
 .comment {
@@ -114,5 +114,12 @@
 }
 
 .paragraph-box:has-caret {
+    -fx-background-color: white;
+}
+text-flow:has-caret {
+    -fx-background-color: red;
+}
+.lineno {
     -fx-background-color: #707880;
+    -fx-text-fill: black;
 }
