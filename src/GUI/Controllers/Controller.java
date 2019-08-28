@@ -83,7 +83,7 @@ public class Controller {
     private int from = 0;
     private ExecutorService executor;
 
-    final KeyCombination keyComb1 = new KeyCodeCombination(KeyCode.S,
+    private final KeyCombination keyComb1 = new KeyCodeCombination(KeyCode.S,
             KeyCombination.CONTROL_DOWN);
 
     private static final String[] KEYWORDS = new String[] {
@@ -107,7 +107,7 @@ public class Controller {
                     + "|(?<STRING>" + STRING_PATTERN + ")"
                     + "|(?<COMMENT>" + COMMENT_PATTERN + ")"
     );
-    Subscription cleanupWhenDone;
+    private Subscription cleanupWhenDone;
 
     private String input = "";
     /**

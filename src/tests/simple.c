@@ -3,7 +3,6 @@ int main(){
     int *c = NULL;
     int *d;
     int a = 2;
-    scan(a);
     c = (int*) malloc (sizeof(int)*3);
     c[5] = 3;
     c++;
