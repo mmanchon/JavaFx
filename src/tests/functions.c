@@ -3,9 +3,10 @@ void function1 (int *b){
     print("Array",b[3]);
 }
 
-void function2(){
+void function2(int *i){
     int b = 0;
     b++;
+	*i++;
 }
 
 int main(){
@@ -15,6 +16,8 @@ int main(){
     for(i = 0; i < 4; i++){
         a[i] = i;
     }
-
-    function1(a);
+	scan(i);
+	
+    function2(&i);
 }
+

@@ -24,3 +24,7 @@
 .text-area{
     -fx-text-fill:#C5C8C6 ;
 }
+
+.image{
+    -fx-background-size: cover;
+}

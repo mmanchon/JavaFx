@@ -18,6 +18,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -25,7 +26,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.model.StyleSpans;
@@ -35,6 +35,8 @@ import org.reactfx.Subscription;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,7 +45,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.IntFunction;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -87,8 +88,22 @@ public class Controller {
             KeyCombination.CONTROL_DOWN);
 
     private static final String[] KEYWORDS = new String[] {
-            "int","void","main","if","do","while","return","for","include","define"
+            "int","void","main","if","do","while","return","for","include","define","malloc","free","sizeof"
     };
+
+    //TOERIA Y LINKS
+
+
+
+    private final String TEORIA_IF = "The if statement evaluates the test expression inside the parenthesis ().\nIf the test expression is evaluated to true, statements inside the body of if are executed.\n If the test expression is evaluated to false, statements inside the body of if are not executed.";
+
+
+
+
+
+
+
+
 
     private static final String KEYWORD_PATTERN = "\\b(" + String.join("|", KEYWORDS) + ")\\b";
     private static final String PAREN_PATTERN = "\\(|\\)";
@@ -134,9 +149,6 @@ public class Controller {
         terminal.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
-                // this will run whenever text is changed
-                //System.out.println("OLD VALUE: " + oldValue);
-                //System.out.println("NEW VALUE: " + newValue);
 
                 if(newValue.toCharArray()[newValue.length()-1] == '\n' && interpreter.needValue()){
                     interpreter.setValue(input);
@@ -154,8 +166,6 @@ public class Controller {
         codeArea.setOnMouseClicked(new EventHandler<Event>() {
             @Override
             public void handle(Event arg0) {
-              //  System.out.println("selected text:"
-              //          + codeArea.getSelectedText());
 
                 if(!codeArea.getSelectedText().equals("")){
                     detectInstruction(codeArea.getSelectedText());
@@ -172,7 +182,6 @@ public class Controller {
             @Override
             public void handle(KeyEvent event) {
                 if (keyComb1.match(event)) {
-                    System.out.println("Ctrl+R pressed");
                     if(getCurrentTextfile() != null) {
                         onSave();
                     }else{
@@ -216,51 +225,71 @@ public class Controller {
 
 
     private void detectInstruction(String text){
-        if(Arrays.asList(KEYWORDS).contains(text)){// "int","void","main","if","do","while","return","for","include","define"
-
+        if(Arrays.asList(KEYWORDS).contains(text)){
             Parent root;
             BasicTheory basicTheory;
-            switch (text){
-                case "if":
-                    basicTheory = new BasicTheory("Teoria del if",null);
-                    break;
-                case "int":
-                    basicTheory = new BasicTheory("Teoria del int",null);
-                    break;
-                case "void":
-                    basicTheory = new BasicTheory("Teoria del void",null);
+            try {
+                switch (text){
+                    case "if":
 
-                    break;
-                case "main":
-                    basicTheory = new BasicTheory("Teoria del main",null);
+                            basicTheory = new BasicTheory(TEORIA_IF,new Image("Resources/img/if-theory.jpg"),new URI("https://www.tutorialspoint.com/cprogramming/if_else_statement_in_c.htm"));
 
-                    break;
-                case "do":
-                    basicTheory = new BasicTheory("Teoria del do",null);
+                        break;
+                    case "int":
+                        basicTheory = new BasicTheory("Teoria del int",null,new URI(""));
+                        break;
+                    case "void":
+                        basicTheory = new BasicTheory("Teoria del void",null,new URI(""));
 
-                    break;
-                case "while":
-                    basicTheory = new BasicTheory("Teoria del while",null);
+                        break;
+                    case "main":
+                        basicTheory = new BasicTheory("Teoria del main",null,new URI(""));
 
-                    break;
-                case "return":
-                    basicTheory = new BasicTheory("Teoria del return",null);
+                        break;
+                    case "do":
+                        basicTheory = new BasicTheory("Teoria del do",null,new URI(""));
 
-                    break;
-                case "for":
-                    basicTheory = new BasicTheory("Teoria del for",null);
+                        break;
+                    case "while":
+                        basicTheory = new BasicTheory("Teoria del while",null,new URI(""));
 
-                    break;
-                case "include":
-                    basicTheory = new BasicTheory("Teoria del include",null);
+                        break;
+                    case "return":
+                        basicTheory = new BasicTheory("Teoria del return",null,new URI(""));
 
-                    break;
-                case "define":
-                    basicTheory = new BasicTheory("Teoria del define",null);
+                        break;
+                    case "for":
+                        basicTheory = new BasicTheory("Teoria del for",null,new URI(""));
 
-                    break;
-                    default:
-                        basicTheory = new BasicTheory("",null);
+                        break;
+                    case "include":
+                        basicTheory = new BasicTheory("Teoria del include",null,new URI(""));
+
+                        break;
+                    case "define":
+                        basicTheory = new BasicTheory("Teoria del define",null,new URI(""));
+
+                        break;
+                    case "malloc":
+                        basicTheory = new BasicTheory("Teoria del define",null,new URI(""));
+
+                        break;
+                    case "free":
+                        basicTheory = new BasicTheory("Teoria del define",null,new URI(""));
+
+                        break;
+                    case "sizeof":
+                        basicTheory = new BasicTheory("Teoria del define",null,new URI(""));
+
+                        break;
+                        default:
+                            basicTheory = new BasicTheory("",null,new URI(""));
+                }
+
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+                basicTheory = new BasicTheory();
+
             }
             try {
 
