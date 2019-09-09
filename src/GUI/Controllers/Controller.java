@@ -88,15 +88,32 @@ public class Controller {
             KeyCombination.CONTROL_DOWN);
 
     private static final String[] KEYWORDS = new String[] {
-            "int","void","main","if","do","while","return","for","include","define","malloc","free","sizeof"
+            "int","void","main","if","do","while","return","for","include","define","malloc","free","sizeof","else"
     };
 
     //TOERIA Y LINKS
 
 
 
-    private final String TEORIA_IF = "The if statement evaluates the test expression inside the parenthesis ().\nIf the test expression is evaluated to true, statements inside the body of if are executed.\n If the test expression is evaluated to false, statements inside the body of if are not executed.";
-
+    private final String TEORIA_IF = "The if statement evaluates the test expression inside the parenthesis ().\nIf the test expression is evaluated to true, statements inside the body of if are executed.\nIf the test expression is evaluated to false, statements inside the body of if are not executed.";
+    private final String TEORIA_INT = "Data types in c refer to an extensive system used for declaring variables or functions of different types.\nThe type of a variable determines how much space it occupies in storage and how the bit pattern stored is interpreted.\nINT: 2 or 4 bytes\n\t-32,768 to 32,767 or -2,147,483,648 to 2,147,483,647";
+    private final String TEORIA_VOID = "A function may return a value. The return_type is the data type of the value the function returns.\n Some functions perform the desired operations without returning a value.\n In this case, the return_type is the keyword void.";
+    private final String TEORIA_MAIN = "All C language programs must have a main() function. It’s the core of every program.\n It’s required. The main() function doesn’t really have to do anything other than be present inside your C source code.\n Eventually, it contains instructions that tell the computer to carry out whatever task your program is designed to do.\n But it’s not officially required to do anything.";
+    private final String TEORIA_DO = "Unlike for and while loops, which test the loop condition at the top of the loop, the do...while loop in C programming checks its condition at the bottom of the loop.\nA do...while loop is similar to a while loop, except the fact that it is guaranteed to execute at least one time.";
+    private final String TEORIA_WHILE = "A while loop in C programming repeatedly executes a target statement as long as a given condition is true.";
+    private final String TEORIA_RETURN = "The return statement terminates the execution of a function and returns control to the calling function.\n Execution resumes in the calling function at the point immediately following the call.\n A return statement can also return a value to the calling function.";
+    private final String TEORIA_FOR = "A for loop is a repetition control structure that allows you to efficiently write a loop that needs to execute a specific number of times.";
+    private final String TEORIA_INCLUDE = "A header file is a file with extension .h which contains C function declarations and macro definitions to be shared between several source files. There are two types of header files: the files that the programmer writes and the files that comes with your compiler.\n" +
+            "\n" +
+            "You request to use a header file in your program by including it with the C preprocessing directive #include, like you have seen inclusion of stdio.h header file, which comes along with your compiler.\n" +
+            "\n" +
+            "Including a header file is equal to copying the content of the header file but we do not do it because it will be error-prone and it is not a good idea to copy the content of a header file in the source files, especially if we have multiple source files in a program.";
+    private final String TEORIA_DEFINE = "The C Preprocessor is not a part of the compiler, but is a separate step in the compilation process. In simple terms, a C Preprocessor is just a text substitution tool and it instructs the compiler to do required pre-processing before the actual compilation. We'll refer to the C Preprocessor as CPP.\n" +
+            "\n" +
+            "All preprocessor commands begin with a hash symbol (#). It must be the first nonblank character, and for readability, a preprocessor directive should begin in the first column.";
+    private final String TEORIA_MALLOC = "The C library function void *malloc(size_t size) allocates the requested memory and returns a pointer to it.";
+    private final String TEORIA_FREE = "The C library function void free(void *ptr) deallocates the memory previously allocated by a call to calloc, malloc, or realloc.";
+    private final String TEORIA_SIZEOF = "When sizeof() is used with the data types, it simply returns the amount of memory allocated to that data type.\n The output can be different on different machines like a 32-bit system can show different output while a 64-bit system can show different of same data types.";
 
 
 
@@ -231,55 +248,58 @@ public class Controller {
             try {
                 switch (text){
                     case "if":
-
-                            basicTheory = new BasicTheory(TEORIA_IF,new Image("Resources/img/if-theory.jpg"),new URI("https://www.tutorialspoint.com/cprogramming/if_else_statement_in_c.htm"));
+                         basicTheory = new BasicTheory(TEORIA_IF,new Image("Resources/img/if-theory.jpg"),new URI("https://www.tutorialspoint.com/cprogramming/if_else_statement_in_c.htm"));
 
                         break;
                     case "int":
-                        basicTheory = new BasicTheory("Teoria del int",null,new URI(""));
+                        basicTheory = new BasicTheory(TEORIA_INT,new Image("Resources/img/int.jpg"),new URI("https://www.tutorialspoint.com/cprogramming/c_data_types.htm"));
                         break;
                     case "void":
-                        basicTheory = new BasicTheory("Teoria del void",null,new URI(""));
+                        basicTheory = new BasicTheory(TEORIA_VOID,null,new URI("https://www.tutorialspoint.com/cprogramming/c_functions.htm"));
 
                         break;
                     case "main":
-                        basicTheory = new BasicTheory("Teoria del main",null,new URI(""));
+                        basicTheory = new BasicTheory(TEORIA_MAIN,null,new URI("https://www.dummies.com/programming/c/the-importance-of-the-main-function-in-c-programming/"));
 
                         break;
                     case "do":
-                        basicTheory = new BasicTheory("Teoria del do",null,new URI(""));
+                        basicTheory = new BasicTheory(TEORIA_DO,new Image("Resources/img/do.jpg"),new URI("https://www.tutorialspoint.com/cprogramming/c_do_while_loop.htm"));
 
                         break;
                     case "while":
-                        basicTheory = new BasicTheory("Teoria del while",null,new URI(""));
+                        basicTheory = new BasicTheory(TEORIA_WHILE,new Image("Resources/img/while.jpg"),new URI("https://www.tutorialspoint.com/cprogramming/c_while_loop.htm"));
 
                         break;
                     case "return":
-                        basicTheory = new BasicTheory("Teoria del return",null,new URI(""));
+                        basicTheory = new BasicTheory(TEORIA_RETURN,null,new URI("https://docs.microsoft.com/en-us/cpp/c-language/return-statement-c?view=vs-2019"));
 
                         break;
                     case "for":
-                        basicTheory = new BasicTheory("Teoria del for",null,new URI(""));
+                        basicTheory = new BasicTheory(TEORIA_FOR,new Image("Resources/img/for.jpg"),new URI("https://www.tutorialspoint.com/cprogramming/c_for_loop.htm"));
 
                         break;
                     case "include":
-                        basicTheory = new BasicTheory("Teoria del include",null,new URI(""));
+                        basicTheory = new BasicTheory(TEORIA_INCLUDE,null,new URI("https://www.tutorialspoint.com/cprogramming/c_header_files.htm"));
 
                         break;
                     case "define":
-                        basicTheory = new BasicTheory("Teoria del define",null,new URI(""));
+                        basicTheory = new BasicTheory(TEORIA_DEFINE,null,new URI("https://www.tutorialspoint.com/cprogramming/c_preprocessors.htm"));
 
                         break;
                     case "malloc":
-                        basicTheory = new BasicTheory("Teoria del define",null,new URI(""));
+                        basicTheory = new BasicTheory(TEORIA_MALLOC,new Image("Resources/img/malloc.JPG"),new URI("https://www.tutorialspoint.com/c_standard_library/c_function_malloc.htm"));
 
                         break;
                     case "free":
-                        basicTheory = new BasicTheory("Teoria del define",null,new URI(""));
+                        basicTheory = new BasicTheory(TEORIA_FREE,new Image("Resources/img/free.JPG"),new URI("https://www.tutorialspoint.com/c_standard_library/c_function_free.htm"));
 
                         break;
                     case "sizeof":
-                        basicTheory = new BasicTheory("Teoria del define",null,new URI(""));
+                        basicTheory = new BasicTheory(TEORIA_SIZEOF,new Image("Resources/img/sizeof.JPG"),new URI("https://www.tutorialspoint.com/sizeof-operator-in-c"));
+
+                        break;
+                    case "else":
+                        basicTheory = new BasicTheory(TEORIA_IF,new Image("Resources/img/if-theory.jpg"),new URI("https://www.tutorialspoint.com/cprogramming/if_else_statement_in_c.htm"));
 
                         break;
                         default:

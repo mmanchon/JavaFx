@@ -15,6 +15,7 @@ import Interpreter.Tokens.Token;
 import Interpreter.Tokens.Type;
 import com.sun.deploy.security.ValidationState;
 import com.sun.xml.internal.ws.util.StringUtils;
+import javafx.scene.image.Image;
 
 import java.util.Random;
 
@@ -454,7 +455,7 @@ public class Instructions {
             arrayType = (ArrayType) variable.getType();
 
             if (index > arrayType.getMaxPosition()) {
-                throw new AccessError("Error en acceder al array", null, index, arrayType.getMinPosition(), arrayType.getMaxPosition());
+                throw new AccessError("Error when trying to access array.\nYour array has a size of "+ (arrayType.getMaxPosition()+1)+" and goes from " + arrayType.getMinPosition()+" to "+arrayType.getMaxPosition()+".\nYou are trying to acces "+index+"position.", new Image("Resources/img/c-arrays.jpg"), index, arrayType.getMinPosition(), arrayType.getMaxPosition());
             }
 
 

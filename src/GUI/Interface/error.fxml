@@ -10,13 +10,18 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.geometry.Rectangle2D?>
 <VBox styleClass="vbox" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.Controllers.ErrorController">
    <children>
-      <Label alignment="CENTER" prefHeight="21.0" prefWidth="439.0" text="Something Went Wrong :(" />
-      <HBox styleClass="hbox" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+      <Label alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" prefHeight="21.0" text="C key words" textAlignment="CENTER" VBox.vgrow="ALWAYS" />
+      <HBox styleClass="hbox" VBox.vgrow="ALWAYS">
          <children>
-            <TextArea fx:id="explicacion" editable="false" prefHeight="200.0" prefWidth="233.0" />
-            <ImageView fx:id="image" fitHeight="198.0" fitWidth="206.0" pickOnBounds="true" preserveRatio="true" />
+            <TextArea fx:id="explicacion" editable="false" wrapText="true" HBox.hgrow="SOMETIMES" />
+            <ImageView fx:id="image" pickOnBounds="true" preserveRatio="true">
+               <viewport>
+                  <Rectangle2D />
+               </viewport>
+            </ImageView>
          </children>
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

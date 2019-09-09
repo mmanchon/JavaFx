@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -46,6 +47,7 @@ public class GUI extends Application {
 
         Scene scene = new Scene(rootLayout);
 
+        this.stage.getIcons().add(new Image("Resources/img/icon.png"));
         this.stage.setTitle("Memory Debug");
         this.stage.setScene(scene);
         this.interpreter.setController(controller);

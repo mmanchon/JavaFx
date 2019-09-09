@@ -39,8 +39,20 @@
                           <items>
                               <Menu mnemonicParsing="false" text="Instructions">
                                 <items>
-                                  <MenuItem mnemonicParsing="false" text="while" />
-                                  <MenuItem onAction="#theoryMenuItem" mnemonicParsing="false" text="if" />
+                                    <MenuItem onAction="#theoryMenuItem" mnemonicParsing="false" text="while" />
+                                    <MenuItem onAction="#theoryMenuItem" mnemonicParsing="false" text="if" />
+                                    <MenuItem onAction="#theoryMenuItem" mnemonicParsing="false" text="int" />
+                                    <MenuItem onAction="#theoryMenuItem" mnemonicParsing="false" text="void" />
+                                    <MenuItem onAction="#theoryMenuItem" mnemonicParsing="false" text="main" />
+                                    <MenuItem onAction="#theoryMenuItem" mnemonicParsing="false" text="do" />
+                                    <MenuItem onAction="#theoryMenuItem" mnemonicParsing="false" text="return" />
+                                    <MenuItem onAction="#theoryMenuItem" mnemonicParsing="false" text="include" />
+                                    <MenuItem onAction="#theoryMenuItem" mnemonicParsing="false" text="define" />
+                                    <MenuItem onAction="#theoryMenuItem" mnemonicParsing="false" text="malloc" />
+                                    <MenuItem onAction="#theoryMenuItem" mnemonicParsing="false" text="free" />
+                                    <MenuItem onAction="#theoryMenuItem" mnemonicParsing="false" text="sizeof" />
+                                    <MenuItem onAction="#theoryMenuItem" mnemonicParsing="false" text="else" />
+
                                 </items>
                               </Menu>
                           </items>

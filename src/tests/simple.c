@@ -4,12 +4,10 @@ int main(){
     int *d;
     int a = 2;
     c = (int*) malloc (sizeof(int)*3);
+	c[10] = 10;
     c++;
+    c[10] = 2;
     d = &a;
 	free(c);
-    free(d);
-}
-eof(int) * c[1]);
-    free(c);
     free(d);
 }
