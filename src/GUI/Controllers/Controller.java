@@ -3,6 +3,8 @@ package GUI.Controllers;
 import GUI.Models.Editor;
 import GUI.Models.MemoryRow;
 import GUI.Models.TextFile;
+import Interpreter.Errors.ArrayErrors.AccessError;
+import Interpreter.Errors.BasicError;
 import Interpreter.Interpreter;
 import Interpreter.Theory.BasicTheory;
 import javafx.beans.value.ChangeListener;
@@ -336,6 +338,30 @@ public class Controller {
         }
     }
 
+    private void openPopUpView(BasicError basicError) {
+        Parent root;
+        try {
+
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("../Interface/error.fxml"));
+
+            root = loader.load();
+
+            ErrorController errorController = (ErrorController) loader.getController();
+            errorController.setError(basicError);
+
+            Stage stage = new Stage();
+
+            stage.setTitle("Error");
+            stage.setScene(new Scene(root));
+
+            stage.show();
+            // Hide this current window (if this is what you want)
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private Task<StyleSpans<Collection<String>>> computeHighlightingAsync() {
         String text = codeArea.getText();
         Task<StyleSpans<Collection<String>>> task = new Task<StyleSpans<Collection<String>>>() {
@@ -454,6 +480,7 @@ public class Controller {
                 this.codeArea.clear();
                 this.currentTextfile.getContent().forEach(line -> this.codeArea.appendText(line + "\n"));
                 this.interpreter.setNewFile(file);
+                if(getCurrentTextfile() != null)restart();
             } else {
                 System.out.println("Error loading codeArea!");
             }
@@ -477,16 +504,29 @@ public class Controller {
 
     @FXML
     private void restart() {
-        this.tableView.getItems().remove(0, this.tableView.getItems().size());
-        this.dynamicTableView.getItems().remove(0, this.dynamicTableView.getItems().size());
-        this.interpreter.eraseAllData();
-        this.interpreter.restart();
-        this.from = 0;
+        if(getCurrentTextfile() != null) {
+            this.tableView.getItems().remove(0, this.tableView.getItems().size());
+            this.dynamicTableView.getItems().remove(0, this.dynamicTableView.getItems().size());
+            this.interpreter.eraseAllData();
+            this.interpreter.restart();
+            this.from = 0;
+        }
     }
 
     @FXML
     private void theoryMenuItem(ActionEvent e){
         detectInstruction(((MenuItem)e.getSource()).getText());
+    }
+
+    @FXML
+    private void errorMenuItem(ActionEvent e){
+        try {
+            this.openPopUpView( new BasicError("Arrays a kind of data structure that can store a fixed-size sequential collection of elements of the same type. An array is used to store a collection of data, but it is often more useful to think of an array as a collection of variables of the same type.\n" +
+                    "\n" +
+                    "Instead of declaring individual variables, such as number0, number1, ..., and number99, you declare one array variable such as numbers and use numbers[0], numbers[1], and ..., numbers[99] to represent individual variables. A specific element in an array is accessed by an index.", new Image("Resources/img/array.PNG"),new URI("https://www.tutorialspoint.com/cprogramming/c_arrays.htm")));
+        } catch (URISyntaxException e1) {
+            e1.printStackTrace();
+        }
     }
 
     public void shutdown() {

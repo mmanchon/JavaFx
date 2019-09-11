@@ -59,7 +59,7 @@
                         </Menu>
                         <Menu mnemonicParsing="false" text="Exceptions">
                           <items>
-                            <MenuItem mnemonicParsing="false" text="Array access" />
+                            <MenuItem onAction="#errorMenuItem" mnemonicParsing="false" text="Array access" />
                           </items>
                         </Menu>
                   </items>

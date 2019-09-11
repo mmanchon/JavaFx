@@ -3,14 +3,16 @@ package Interpreter.Errors.ArrayErrors;
 import Interpreter.Errors.BasicError;
 import javafx.scene.image.Image;
 
+import java.net.URI;
+
 public class AccessError extends BasicError {
 
     private Object tryingAccess;
     private Object minimumLimitAccess;
     private Object maximumLimitAccess;
 
-    public AccessError(String message, Image image, Object tryingAccess, Object minimumLimitAccess, Object maximumLimitAccess) {
-        super(message, image);
+    public AccessError(String message, Image image, Object tryingAccess, Object minimumLimitAccess, Object maximumLimitAccess, URI url) {
+        super(message, image, url);
         this.tryingAccess = tryingAccess;
         this.minimumLimitAccess = minimumLimitAccess;
         this.maximumLimitAccess = maximumLimitAccess;

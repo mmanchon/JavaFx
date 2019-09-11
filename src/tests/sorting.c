@@ -1,31 +1,40 @@
+#include <stdio.h>
+
 int main(){
-  int array[100], n, c, d, swap,x;
+  int *array, n, c, d, left, read, limit = 10, minimo, posminimo;
 
   print("Enter number of elements\n");
   scan(n);
 
+  array = (int*)malloc(sizeof(int)*n);
+
   print("Enter ",n ," integers\n");
 
-  for (c = 0; c < n; c++){
-    scan(array[c]);
+  for(c = 0; c < n; c++){
+      scan(read);
+      array[c] = read;
   }
 
-  for (c = 0 ; c < n - 1; c++){
-    for (d = 0 ; d < n - c - 1; d++){
-      x = d+1;
-      if (array[d] > array[x]){
-        swap       = array[d];
-        array[d]   = array[x];
-        array[x] = swap;
-      }
+  sCaN(limit);
+
+  for (c = 0 ; c < limit; c++){
+    minimo = array[c];
+    posminimo = c;
+    d = c;
+    d++;
+    for(d; d < n; d++){
+        left = array[d];
+
+        if(left < minimo){
+            minimo = array[d];
+            posminimo = d;
+        }
     }
+    array[posminimo] = array[c];
+    array[c] = minimo;
   }
-
-  printf("Sorted list in ascending order:\n");
-
-  for (c = 0; c < n; c++){
-     print(array[c]);
-  }
-
+  print("Sorted list in ascending order!\n");
+  free(array);
   return 0;
 }
+
